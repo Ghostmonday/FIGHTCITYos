@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CommonCrypto
 
 /// Service for collecting and managing telemetry data (opt-in only)
 @MainActor
@@ -156,7 +157,3 @@ struct TelemetryStats {
     let lastUploadDate: Date?
     let isEnabled: Bool
 }
-
-// MARK: - Import CommonCrypto
-
-import CommonCrypto
