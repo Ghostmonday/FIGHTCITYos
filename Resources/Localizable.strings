@@ -1,0 +1,97 @@
+//
+//  Localizable.strings
+//  FightCityTickets
+//
+//  English localization strings
+//
+
+// MARK: - Onboarding
+
+"Onboarding.Title" = "Scan Your Ticket";
+"Onboarding.Description" = "Take a photo of your parking ticket and we'll help you fight it.";
+"Onboarding.Validate.Title" = "Instant Validation";
+"Onboarding.Validate.Description" = "We verify your citation against city records instantly.";
+"Onboarding.Appeal.Title" = "Fight Your Ticket";
+"Onboarding.Appeal.Description" = "Get help preparing your appeal with our AI-powered tools.";
+"Onboarding.Continue" = "Continue";
+"Onboarding.GetStarted" = "Get Started";
+"Onboarding.Skip" = "Skip";
+
+// MARK: - Capture
+
+"Capture.Instruction" = "Position the ticket in the frame";
+"Capture.Capture" = "Capture";
+"Capture.Retake" = "Retake Photo";
+"Capture.ManualEntry" = "Enter Manually";
+"Capture.Processing" = "Processing...";
+"Capture.FrameQuality.Good" = "Perfect conditions";
+"Capture.FrameQuality.Blurry" = "Image may be blurry";
+"Capture.FrameQuality.Glare" = "Glare detected";
+"Capture.FrameQuality.Dark" = "Image too dark";
+
+// MARK: - Confirmation
+
+"Confirmation.Title" = "Confirm";
+"Confirmation.ExtractedInfo" = "Extracted Information";
+"Confirmation.Confidence" = "Confidence";
+"Confirmation.IsCorrect" = "Is this correct?";
+"Confirmation.YesContinue" = "Yes, Continue";
+"Confirmation.Edit" = "Edit Citation";
+"Confirmation.EditTitle" = "Edit Citation Number";
+"Confirmation.DetectedCity" = "Detected City";
+
+// MARK: - Validation
+
+"Validation.Valid" = "Citation validated successfully!";
+"Validation.Invalid" = "Could not validate citation";
+"Validation.Loading" = "Validating...";
+
+// MARK: - History
+
+"History.Title" = "History";
+"History.Empty.Title" = "No Citations Yet";
+"History.Empty.Description" = "Your scanned citations will appear here.";
+"History.ScanFirst" = "Scan First Citation";
+
+// MARK: - Settings
+
+"Settings.Title" = "Settings";
+"Settings.Telemetry.Title" = "Telemetry";
+"Settings.Telemetry.ShareData" = "Share anonymous data to improve OCR";
+"Settings.Telemetry.WhatIsShared" = "What is shared?";
+"Settings.About.Title" = "About";
+"Settings.Version" = "Version";
+"Settings.PrivacyPolicy" = "Privacy Policy";
+"Settings.TermsOfService" = "Terms of Service";
+"Settings.ClearData" = "Clear All Data";
+
+// MARK: - Errors
+
+"Error.CameraPermission" = "Camera access required";
+"Error.CaptureFailed" = "Failed to capture image";
+"Error.ProcessingFailed" = "Failed to process image";
+"Error.NetworkError" = "Network error. Please check your connection.";
+"Error.ValidationFailed" = "Failed to validate citation";
+
+// MARK: - Telemetry
+
+"Telemetry.Title" = "Help Improve OCR";
+"Telemetry.Description" = "By sharing anonymous data about your scans, you help us improve accuracy for your city and all users.";
+"Telemetry.DataShared" = "Data shared:";
+"Telemetry.DataNotShared" = "Data NOT shared:";
+"Telemetry.Privacy" = "Privacy:";
+
+// MARK: - Cities
+
+"City.SanFrancisco" = "San Francisco";
+"City.LosAngeles" = "Los Angeles";
+"City.NewYork" = "New York";
+"City.Denver" = "Denver";
+
+// MARK: - Accessibility
+
+"Accessibility.CaptureButton" = "Capture ticket photo";
+"Accessibility.CaptureHint" = "Tap to take a photo of your parking ticket";
+"Accessibility.TorchButton" = "Toggle flash";
+"Accessibility.GalleryButton" = "Open photo library";
+"Accessibility.ManualEntry" = "Enter citation number manually";
