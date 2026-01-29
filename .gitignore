@@ -1,0 +1,54 @@
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+*.xcuserstate
+DerivedData/
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# CocoaPods (if used)
+Pods/
+*.xcworkspace
+
+# Build artifacts
+build/
+*.app
+*.framework
+*.dylib
+
+# Secrets & Config
+*.env
+*.xcconfig.local
+*.p8
+*.p12
+*.mobileprovision
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# SwiftLint
+.swiftlint.yml.local
+
+# Temporary files
+*.tmp
+*.log

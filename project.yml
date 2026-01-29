@@ -5,34 +5,148 @@ options:
     iOS: "16.0"
   xcodeVersion: "15.0"
   generateEmptyDirectories: true
+  groupSortPosition: top
+  developmentLanguage: en
 
 settings:
   base:
     SWIFT_VERSION: "5.9"
-    TARGETED_DEVICE_FAMILY: "1,2"
-    DEVELOPMENT_TEAM: ""
-    CODE_SIGN_STYLE: Automatic
+    SWIFT_OPTIMIZATION_LEVEL: -Onone
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+    GCC_OPTIMIZATION_LEVEL: 0
     ENABLE_BITCODE: NO
+    ENABLE_TESTABILITY: YES
+    CODE_SIGN_STYLE: Automatic
+    DEVELOPMENT_TEAM: ""
+    IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+    TARGETED_DEVICE_FAMILY: "1,2"
+    SUPPORTS_MACCATALYST: NO
+    SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: YES
+
+configs:
+  Debug:
+    SWIFT_OPTIMIZATION_LEVEL: -Onone
+    SWIFT_ACTIVE_COMPILATION_CONDITIONS: DEBUG
+    GCC_OPTIMIZATION_LEVEL: 0
+  Release:
+    SWIFT_OPTIMIZATION_LEVEL: -O
+    GCC_OPTIMIZATION_LEVEL: s
 
 targets:
-  FightCityTickets:
-    type: application
+  # ============================================
+  # FightCityFoundation Framework (Pure Swift)
+  # ============================================
+  FightCityFoundation:
+    type: framework
     platform: iOS
+    deploymentTarget: "16.0"
     sources:
-      - path: App
-      - path: Core
-      - path: Domain
-      - path: Network
-      - path: UI
-      - path: Resources
+      - path: Sources/FightCityFoundation
     settings:
       base:
-        INFOPLIST_FILE: Resources/Info.plist
+        PRODUCT_BUNDLE_IDENTIFIER: com.fightcitytickets.foundation
+        PRODUCT_NAME: FightCityFoundation
+        DEFINES_MODULE: YES
+        SWIFT_VERSION: "5.9"
+        ENABLE_TESTABILITY: YES
+        CODE_SIGN_STYLE: Automatic
+        APPLICATION_EXTENSION_API_ONLY: YES
+    frameworks:
+      - Foundation
+      - Security
+    info:
+      path: Support/FightCityFoundation-Info.plist
+      properties:
+        CFBundleName: $(PRODUCT_NAME)
+        CFBundlePackageType: FMWK
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+        CFBundleExecutable: $(EXECUTABLE_NAME)
+        NSPrincipalClass: ""
+
+  # ============================================
+  # FightCityiOS Framework (iOS-Specific)
+  # ============================================
+  FightCityiOS:
+    type: framework
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: Sources/FightCityiOS
+    dependencies:
+      - target: FightCityFoundation
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fightcitytickets.ios
+        PRODUCT_NAME: FightCityiOS
+        DEFINES_MODULE: YES
+        SWIFT_VERSION: "5.9"
+        ENABLE_TESTABILITY: YES
+        CODE_SIGN_STYLE: Automatic
+        APPLICATION_EXTENSION_API_ONLY: YES
+    frameworks:
+      - Foundation
+      - UIKit
+      - AVFoundation
+      - Vision
+      - CoreImage
+      - Security
+    info:
+      path: Support/FightCityiOS-Info.plist
+      properties:
+        CFBundleName: $(PRODUCT_NAME)
+        CFBundlePackageType: FMWK
+        CFBundleShortVersionString: "1.0"
+        CFBundleVersion: "1"
+        CFBundleIdentifier: $(PRODUCT_BUNDLE_IDENTIFIER)
+        CFBundleExecutable: $(EXECUTABLE_NAME)
+        NSPrincipalClass: ""
+
+  # ============================================
+  # FightCity App (Main Application)
+  # ============================================
+  FightCity:
+    type: application
+    platform: iOS
+    deploymentTarget: "16.0"
+    sources:
+      - path: Sources/FightCity
+      - path: Resources
+    dependencies:
+      - target: FightCityiOS
+      - target: FightCityFoundation
+    settings:
+      base:
         PRODUCT_BUNDLE_IDENTIFIER: com.fightcitytickets.app
+        PRODUCT_NAME: FightCityTickets
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+        INFOPLIST_FILE: Resources/Info.plist
+        INFOPLIST_PREPROCESS: YES
         GENERATE_INFOPLIST_FILE: NO
+        SWIFT_VERSION: "5.9"
         SWIFT_EMIT_LOC_STRINGS: YES
+        ENABLE_TESTABILITY: YES
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_TEAM: ""
+        IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+        TARGETED_DEVICE_FAMILY: "1,2"
+        SUPPORTS_MACCATALYST: NO
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks"
+    frameworks:
+      - Foundation
+      - SwiftUI
+      - UIKit
+      - AVFoundation
+      - Vision
+      - CoreImage
+      - Security
+      - BackgroundTasks
+    capabilities:
+      - Background Modes:
+          - Background processing
+          - Background fetch
     info:
       path: Resources/Info.plist
       properties:
@@ -43,9 +157,13 @@ targets:
         CFBundleShortVersionString: "1.0"
         CFBundlePackageType: APPL
         CFBundleExecutable: $(EXECUTABLE_NAME)
-        UILaunchScreen:
-          UIColorName: ""
-          UIImageName: ""
+        CFBundleInfoDictionaryVersion: "6.0"
+        CFBundleDevelopmentRegion: en
+        CFBundleSupportedPlatforms:
+          - iPhoneOS
+        LSRequiresIPhoneOS: YES
+        UIRequiredDeviceCapabilities:
+          - armv7
         UISupportedInterfaceOrientations:
           - UIInterfaceOrientationPortrait
         UISupportedInterfaceOrientations~ipad:
@@ -53,13 +171,106 @@ targets:
           - UIInterfaceOrientationPortraitUpsideDown
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
-        NSCameraUsageDescription: "FightCityTickets needs camera access to scan parking ticket citation numbers."
-        NSPhotoLibraryUsageDescription: "FightCityTickets needs photo library access to import ticket photos."
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
           UISceneConfigurations:
             UIWindowSceneSessionRoleApplication:
               - UISceneConfigurationName: Default Configuration
                 UISceneDelegateClassName: $(PRODUCT_MODULE_NAME).SceneDelegate
+        NSCameraUsageDescription: "FightCityTickets needs camera access to scan parking ticket citation numbers."
+        NSPhotoLibraryUsageDescription: "FightCityTickets needs photo library access to import ticket photos."
+        NSPhotoLibraryAddUsageDescription: "FightCityTickets needs photo library access to save captured ticket images."
         BGTaskSchedulerPermittedIdentifiers:
           - com.fightcitytickets.telemetry-upload
+        ITSAppUsesNonExemptEncryption: NO
+        UIApplicationSupportsIndirectInputEvents: YES
+        UILaunchScreen:
+          UIColorName: AccentColor
+          UIImageName: ""
+
+  # ============================================
+  # Test Targets
+  # ============================================
+  FightCityFoundationTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests/UnitTests/FoundationTests
+    dependencies:
+      - target: FightCityFoundation
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fightcitytickets.foundation.tests
+        PRODUCT_NAME: FightCityFoundationTests
+        SWIFT_VERSION: "5.9"
+        CODE_SIGN_STYLE: Automatic
+        TEST_HOST: ""
+        BUNDLE_LOADER: ""
+    frameworks:
+      - Foundation
+      - XCTest
+
+  FightCityiOSTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests/UnitTests/iOSTests
+    dependencies:
+      - target: FightCityiOS
+      - target: FightCityFoundation
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fightcitytickets.ios.tests
+        PRODUCT_NAME: FightCityiOSTests
+        SWIFT_VERSION: "5.9"
+        CODE_SIGN_STYLE: Automatic
+        TEST_HOST: ""
+        BUNDLE_LOADER: ""
+    frameworks:
+      - Foundation
+      - UIKit
+      - XCTest
+      - Vision
+      - AVFoundation
+
+  FightCityAppTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests/UnitTests/AppTests
+    dependencies:
+      - target: FightCity
+      - target: FightCityiOS
+      - target: FightCityFoundation
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fightcitytickets.app.tests
+        PRODUCT_NAME: FightCityAppTests
+        SWIFT_VERSION: "5.9"
+        CODE_SIGN_STYLE: Automatic
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/FightCity.app/FightCity"
+        BUNDLE_LOADER: "$(TEST_HOST)"
+    frameworks:
+      - Foundation
+      - SwiftUI
+      - UIKit
+      - XCTest
+
+  FightCityUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: Tests/UITests
+    dependencies:
+      - target: FightCity
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.fightcitytickets.app.uitests
+        PRODUCT_NAME: FightCityUITests
+        SWIFT_VERSION: "5.9"
+        CODE_SIGN_STYLE: Automatic
+        TEST_TARGET_NAME: FightCity
+    frameworks:
+      - Foundation
+      - XCTest
+      - XCTestUI
