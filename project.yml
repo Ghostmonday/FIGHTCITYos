@@ -7,6 +7,10 @@ options:
   generateEmptyDirectories: true
   groupSortPosition: top
   developmentLanguage: en
+  defaultConfig: Debug
+  xcodeVersion: '15.0'
+  groupSortPosition: top
+  createIntermediateGroups: true
 
 settings:
   base:
@@ -42,6 +46,8 @@ targets:
     deploymentTarget: "16.0"
     sources:
       - path: Sources/FightCityFoundation
+        excludes:
+          - "**/.DS_Store"
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.fightcitytickets.foundation
@@ -74,6 +80,8 @@ targets:
     deploymentTarget: "16.0"
     sources:
       - path: Sources/FightCityiOS
+        excludes:
+          - "**/.DS_Store"
     dependencies:
       - target: FightCityFoundation
     settings:
@@ -112,7 +120,11 @@ targets:
     deploymentTarget: "16.0"
     sources:
       - path: Sources/FightCity
+        excludes:
+          - "**/.DS_Store"
       - path: Resources
+        excludes:
+          - "**/.DS_Store"
     dependencies:
       - target: FightCityiOS
       - target: FightCityFoundation
