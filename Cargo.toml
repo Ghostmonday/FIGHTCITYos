@@ -1,0 +1,11 @@
+[package]
+name = "find_proton_pdf"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "find_proton_pdf"
+path = "find_proton_pdf.rs"
+
+[dependencies]
+walkdir = "2.4"

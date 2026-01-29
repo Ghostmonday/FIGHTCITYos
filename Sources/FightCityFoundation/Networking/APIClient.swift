@@ -16,8 +16,14 @@ public protocol APIConfiguration {
 public struct DefaultAPIConfiguration: APIConfiguration {
     public let apiBaseURL: URL
     
-    public init(apiBaseURL: URL = URL(string: "https://api.fightcitytickets.com")!) {
-        self.apiBaseURL = apiBaseURL
+    public init(apiBaseURL: URL? = nil) {
+        if let url = apiBaseURL {
+            self.apiBaseURL = url
+        } else if let url = URL(string: "https://api.fightcitytickets.com") {
+            self.apiBaseURL = url
+        } else {
+            fatalError("Failed to create default API URL - this should never happen")
+        }
     }
 }
 

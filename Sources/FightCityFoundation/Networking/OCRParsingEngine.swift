@@ -153,7 +153,8 @@ public struct OCRParsingEngine {
         result = result.replacingOccurrences(of: " ", with: "")
         result = result.replacingOccurrences(of: "|", with: "I")
         result = result.replacingOccurrences(of: "l", with: "I")
-        result = result.replacingOccurrences(of: "0", with: "O")
+        // Note: Do NOT replace "0" with "O" as this corrupts numeric citation numbers
+        // Only replace ambiguous characters that are clearly misread letters
         
         // Remove non-alphanumeric characters except common separators
         let allowed = CharacterSet.alphanumerics
@@ -189,8 +190,9 @@ public struct OCRParsingEngine {
         
         guard !matches.isEmpty else { return nil }
         
-        return matches.map { match in
-            let matchedString = String(text[Range(match.range, in: text)!])
+        return matches.compactMap { match in
+            guard let range = Range(match.range, in: text) else { return nil }
+            let matchedString = String(text[range])
             return MatchResult(
                 matchedString: matchedString,
                 pattern: pattern,

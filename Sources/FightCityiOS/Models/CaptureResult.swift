@@ -23,7 +23,7 @@ public struct CaptureResult: Identifiable, Codable, Equatable {
     public let boundingBoxes: [BoundingBox]
     public let capturedAt: Date
     
-    /// Raw recognition observations from Vision (not Codable)
+    /// Raw recognition observations from Vision (not Codable - excluded from encoding)
     public var observations: [String: VNRecognizedTextObservation]
     
     public init(
@@ -67,7 +67,8 @@ public struct CaptureResult: Identifiable, Codable, Equatable {
     }
     
     public var hasValidCitation: Bool {
-        extractedCitationNumber != nil && !extractedCitationNumber!.isEmpty
+        guard let citationNumber = extractedCitationNumber else { return false }
+        return !citationNumber.isEmpty
     }
     
     public var hasImage: Bool {
@@ -84,7 +85,7 @@ public struct CaptureResult: Identifiable, Codable, Equatable {
         }
     }
     
-    // MARK: - Coding Keys
+    // MARK: - Codable Conformance
     
     public enum CodingKeys: String, CodingKey {
         case id
@@ -98,6 +99,38 @@ public struct CaptureResult: Identifiable, Codable, Equatable {
         case processingTimeMs
         case boundingBoxes
         case capturedAt
+    }
+    
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(UUID.self, forKey: .id)
+        originalImageData = try container.decodeIfPresent(Data.self, forKey: .originalImageData)
+        croppedImageData = try container.decodeIfPresent(Data.self, forKey: .croppedImageData)
+        rawText = try container.decode(String.self, forKey: .rawText)
+        extractedCitationNumber = try container.decodeIfPresent(String.self, forKey: .extractedCitationNumber)
+        extractedCityId = try container.decodeIfPresent(String.self, forKey: .extractedCityId)
+        extractedDate = try container.decodeIfPresent(String.self, forKey: .extractedDate)
+        confidence = try container.decode(Double.self, forKey: .confidence)
+        processingTimeMs = try container.decode(Int.self, forKey: .processingTimeMs)
+        boundingBoxes = try container.decode([BoundingBox].self, forKey: .boundingBoxes)
+        capturedAt = try container.decode(Date.self, forKey: .capturedAt)
+        observations = [:] // Not decoded - Vision observations are runtime-only
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(id, forKey: .id)
+        try container.encodeIfPresent(originalImageData, forKey: .originalImageData)
+        try container.encodeIfPresent(croppedImageData, forKey: .croppedImageData)
+        try container.encode(rawText, forKey: .rawText)
+        try container.encodeIfPresent(extractedCitationNumber, forKey: .extractedCitationNumber)
+        try container.encodeIfPresent(extractedCityId, forKey: .extractedCityId)
+        try container.encodeIfPresent(extractedDate, forKey: .extractedDate)
+        try container.encode(confidence, forKey: .confidence)
+        try container.encode(processingTimeMs, forKey: .processingTimeMs)
+        try container.encode(boundingBoxes, forKey: .boundingBoxes)
+        try container.encode(capturedAt, forKey: .capturedAt)
+        // observations is excluded from encoding (not Codable)
     }
 }
 

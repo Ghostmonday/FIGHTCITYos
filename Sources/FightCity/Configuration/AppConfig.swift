@@ -107,11 +107,19 @@ public final class AppConfig: ObservableObject {
     private init() {
         // Configure based on build environment
         #if DEBUG
-        self.apiBaseURL = URL(string: "http://localhost:8000")!
-        self.webBaseURL = URL(string: "http://localhost:3000")!
+        guard let apiURL = URL(string: "http://localhost:8000"),
+              let webURL = URL(string: "http://localhost:3000") else {
+            fatalError("Failed to create debug URLs - this should never happen")
+        }
+        self.apiBaseURL = apiURL
+        self.webBaseURL = webURL
         #else
-        self.apiBaseURL = URL(string: "https://api.fightcitytickets.com")!
-        self.webBaseURL = URL(string: "https://fightcitytickets.com")!
+        guard let apiURL = URL(string: "https://api.fightcitytickets.com"),
+              let webURL = URL(string: "https://fightcitytickets.com") else {
+            fatalError("Failed to create production URLs - this should never happen")
+        }
+        self.apiBaseURL = apiURL
+        self.webBaseURL = webURL
         #endif
         
         loadUserPreferences()

@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import Combine
 import FightCityiOS
 import FightCityFoundation
 
@@ -26,8 +25,6 @@ public final class AppCoordinator: ObservableObject {
     @Published public var navigationPath = NavigationPath()
     @Published public var isShowingSheet = false
     @Published public var selectedSheet: SheetDestination?
-    
-    private var cancellables = Set<AnyCancellable>()
     
     public enum SheetDestination: Identifiable {
         case citySelection

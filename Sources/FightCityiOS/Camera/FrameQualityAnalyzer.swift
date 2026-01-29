@@ -126,19 +126,23 @@ public struct FrameQualityAnalyzer {
         filter.setValue(image, forKey: kCIInputImageKey)
         
         guard let output = filter.outputImage,
-              let bitmap = context.createCGImage(output, from: output.extent) else {
+              let bitmap = context.createCGImage(output, from: output.extent),
+              let dataProvider = bitmap.dataProvider,
+              let dataProviderData = dataProvider.data else {
             return 0
         }
         
-        let pixelData = CGDataProvider(data: bitmap.dataProvider!.data)!
-        let data = CFDataGetBytePtr(pixelData)
+        let pixelData = CGDataProvider(data: dataProviderData)
+        guard let data = CFDataGetBytePtr(pixelData) else {
+            return 0
+        }
         let length = CFDataGetLength(pixelData)
         
         var sum = 0
         var sumSquares = 0
         
         for i in stride(from: 0, to: length, by: 4) {
-            let gray = (data![i] + data![i + 1] + data![i + 2]) / 3
+            let gray = (data[i] + data[i + 1] + data[i + 2]) / 3
             sum += Int(gray)
             sumSquares += Int(gray) * Int(gray)
         }
@@ -160,19 +164,23 @@ public struct FrameQualityAnalyzer {
         filter.setValue(1.5, forKey: kCIInputContrastKey)
         
         guard let output = filter.outputImage,
-              let bitmap = context.createCGImage(output, from: output.extent) else {
+              let bitmap = context.createCGImage(output, from: output.extent),
+              let dataProvider = bitmap.dataProvider,
+              let dataProviderData = dataProvider.data else {
             return 0
         }
         
-        let pixelData = CGDataProvider(data: bitmap.dataProvider!.data)!
-        let data = CFDataGetBytePtr(pixelData)
+        let pixelData = CGDataProvider(data: dataProviderData)
+        guard let data = CFDataGetBytePtr(pixelData) else {
+            return 0
+        }
         let length = CFDataGetLength(pixelData)
         
         var highlightPixels = 0
         let threshold = UInt8(240)
         
         for i in stride(from: 0, to: length, by: 4) {
-            if data![i] > threshold || data![i + 1] > threshold || data![i + 2] > threshold {
+            if data[i] > threshold || data[i + 1] > threshold || data[i + 2] > threshold {
                 highlightPixels += 1
             }
         }
@@ -191,18 +199,22 @@ public struct FrameQualityAnalyzer {
         sobelFilter.setValue(image, forKey: kCIInputImageKey)
         
         guard let edges = sobelFilter.outputImage,
-              let bitmap = context.createCGImage(edges, from: edges.extent) else {
+              let bitmap = context.createCGImage(edges, from: edges.extent),
+              let dataProvider = bitmap.dataProvider,
+              let dataProviderData = dataProvider.data else {
             return 1.0
         }
         
-        let pixelData = CGDataProvider(data: bitmap.dataProvider!.data)!
-        let data = CFDataGetBytePtr(pixelData)
+        let pixelData = CGDataProvider(data: dataProviderData)
+        guard let data = CFDataGetBytePtr(pixelData) else {
+            return 1.0
+        }
         let length = CFDataGetLength(pixelData)
         
         // Count edge pixels
         var edgePixels = 0
         for i in stride(from: 0, to: length, by: 4) {
-            let intensity = (data![i] + data![i + 1] + data![i + 2]) / 3
+            let intensity = (data[i] + data[i + 1] + data[i + 2]) / 3
             if intensity > 50 {
                 edgePixels += 1
             }
@@ -220,16 +232,22 @@ public struct FrameQualityAnalyzer {
     
     /// Calculate average brightness
     private func calculateBrightness(_ image: CIImage) -> Double {
-        guard let bitmap = context.createCGImage(image, from: image.extent) else { return 0.5 }
+        guard let bitmap = context.createCGImage(image, from: image.extent),
+              let dataProvider = bitmap.dataProvider,
+              let dataProviderData = dataProvider.data else {
+            return 0.5
+        }
         
-        let pixelData = CGDataProvider(data: bitmap.dataProvider!.data)!
-        let data = CFDataGetBytePtr(pixelData)
+        let pixelData = CGDataProvider(data: dataProviderData)
+        guard let data = CFDataGetBytePtr(pixelData) else {
+            return 0.5
+        }
         let length = CFDataGetLength(pixelData)
         
         var totalBrightness = 0
         
         for i in stride(from: 0, to: length, by: 4) {
-            totalBrightness += Int(data![i] + data![i + 1] + data![i + 2])
+            totalBrightness += Int(data[i] + data[i + 1] + data[i + 2])
         }
         
         let pixelCount = length / 4

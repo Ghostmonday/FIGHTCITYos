@@ -104,61 +104,58 @@ public final class OfflineManager {
     private func syncPendingOperations() {
         guard connectivityChecker.isConnected else { return }
         
-        var failedOperations: [OfflineOperation] = []
-        
-        for operation in queue.all() {
-            do {
-                try performOperation(operation)
-                queue.remove(id: operation.id)
-            } catch {
-                // Calculate backoff for this operation
-                let backoff = calculateBackoff(attempt: operation.attemptCount)
-                operation.attemptCount += 1
-                operation.nextRetry = Date().addingTimeInterval(backoff)
-                
-                if operation.attemptCount >= config.maxRetryAttempts {
-                    // Max retries reached, move to failed
-                    operation.status = .failed
-                    failedOperations.append(operation)
-                } else {
-                    // Update retry time and requeue
-                    operation.status = .retrying
-                    queue.update(operation)
+        Task {
+            var failedOperations: [OfflineOperation] = []
+            
+            for operation in queue.all() {
+                do {
+                    try await performOperation(operation)
+                    queue.remove(id: operation.id)
+                } catch {
+                    // Calculate backoff for this operation
+                    let backoff = calculateBackoff(attempt: operation.attemptCount)
+                    var updatedOperation = operation
+                    updatedOperation.attemptCount += 1
+                    updatedOperation.nextRetry = Date().addingTimeInterval(backoff)
+                    
+                    if updatedOperation.attemptCount >= config.maxRetryAttempts {
+                        // Max retries reached, move to failed
+                        updatedOperation.status = .failed
+                        failedOperations.append(updatedOperation)
+                    } else {
+                        // Update retry time and requeue
+                        updatedOperation.status = .retrying
+                        queue.update(updatedOperation)
+                    }
                 }
             }
-        }
-        
-        // Handle permanently failed operations
-        for op in failedOperations {
-            queue.remove(id: op.id)
-            NotificationCenter.default.post(
-                name: .operationFailed,
-                object: nil,
-                userInfo: ["operation": op]
-            )
+            
+            // Handle permanently failed operations
+            for op in failedOperations {
+                queue.remove(id: op.id)
+                NotificationCenter.default.post(
+                    name: .operationFailed,
+                    object: nil,
+                    userInfo: ["operation": op]
+                )
+            }
         }
     }
     
     /// Perform a single operation (throws on failure)
-    private func performOperation(_ operation: OfflineOperation) throws {
+    private func performOperation(_ operation: OfflineOperation) async throws {
         switch operation.type {
         case .validateCitation(let request):
-            let _: CitationValidationResponse = try await {
-                try Task.checkCancellation()
-                return APIClient.shared.post(.validateCitation(request), body: request)
-            }()
+            try Task.checkCancellation()
+            let _: CitationValidationResponse = try await APIClient.shared.post(.validateCitation(request), body: request)
             
         case .submitAppeal(let request):
-            let _: String = try await {
-                try Task.checkCancellation()
-                return APIClient.shared.post(.submitAppeal(request), body: request)
-            }()
+            try Task.checkCancellation()
+            let _: String = try await APIClient.shared.post(.submitAppeal(request), body: request)
             
         case .telemetryUpload(let request):
-            let _: String = try await {
-                try Task.checkCancellation()
-                return APIClient.shared.post(.telemetryUpload(request), body: request)
-            }()
+            try Task.checkCancellation()
+            let _: String = try await APIClient.shared.post(.telemetryUpload(request), body: request)
         }
     }
     
@@ -176,6 +173,16 @@ public final class OfflineManager {
         retryTimer = Timer.scheduledTimer(withTimeInterval: 60, repeats: true) { [weak self] _ in
             self?.attemptSync()
         }
+    }
+    
+    /// Stop the retry timer and clean up
+    public func stopRetryTimer() {
+        retryTimer?.invalidate()
+        retryTimer = nil
+    }
+    
+    deinit {
+        retryTimer?.invalidate()
     }
 }
 

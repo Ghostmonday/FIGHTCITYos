@@ -6,7 +6,6 @@
 //
 
 import SwiftUI
-import Combine
 import AVFoundation
 import Vision
 import FightCityiOS
@@ -33,10 +32,6 @@ public final class CaptureViewModel: ObservableObject {
     private let apiClient = APIClient.shared
     private let config: AppConfig
     
-    // MARK: - Private State
-    
-    private var cancellables = Set<AnyCancellable>()
-    
     // MARK: - Initialization
     
     public init(config: AppConfig = .shared) {
@@ -49,7 +44,11 @@ public final class CaptureViewModel: ObservableObject {
     public func requestCameraAuthorization() async {
         let granted = await cameraManager.requestAuthorization()
         if granted {
-            try? await setupCamera()
+            do {
+                try await setupCamera()
+            } catch {
+                processingState = .error("Failed to setup camera: \(error.localizedDescription)")
+            }
         }
     }
     
@@ -119,6 +118,8 @@ public final class CaptureViewModel: ObservableObject {
         do {
             processedImage = try await preprocessor.preprocess(image)
         } catch {
+            // Log preprocessing error but continue with original image
+            print("Warning: Image preprocessing failed: \(error.localizedDescription)")
             processedImage = image
         }
         
