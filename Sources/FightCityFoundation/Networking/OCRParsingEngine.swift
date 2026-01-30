@@ -7,6 +7,9 @@
 
 import Foundation
 
+/// APPLE INTELLIGENCE: Use ML classifier first, regex second; merge confidences
+/// APPLE INTELLIGENCE: Add NaturalLanguage sentiment analysis for text quality
+
 /// Parses OCR text using city-specific regex patterns (matching backend CitationValidator)
 public struct OCRParsingEngine {
     // MARK: - City Patterns (from Python backend)

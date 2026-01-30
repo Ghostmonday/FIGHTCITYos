@@ -8,6 +8,9 @@
 import CoreImage
 import UIKit
 
+/// APPLE INTELLIGENCE: Largely superseded by VisionKit preprocessing
+/// APPLE INTELLIGENCE: Retain as fallback for unsupported devices
+
 /// Preprocesses images for optimal OCR results
 public struct OCRPreprocessor {
     private let context = CIContext()

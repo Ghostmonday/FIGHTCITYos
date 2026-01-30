@@ -1,0 +1,4 @@
+# FightCityTickets - Mint packages (optional alternative to Homebrew)
+# Install: mint bootstrap
+# Generate project: mint run yonaskolb/XcodeGen generate
+yonaskolb/XcodeGen@2.38.0

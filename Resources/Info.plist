@@ -23,7 +23,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>FightCityTickets needs camera access to scan parking ticket citation numbers.</string>
+	<string>FightCityTickets needs camera access to scan parking ticket citation numbers using advanced Apple Intelligence document scanning.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>FightCityTickets needs photo library access to import ticket photos.</string>
 	<key>UIApplicationSceneManifest</key>

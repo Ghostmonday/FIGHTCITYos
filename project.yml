@@ -99,6 +99,7 @@ targets:
       - AVFoundation
       - Vision
       - CoreImage
+      - VisionKit
       - Security
     info:
       path: Support/FightCityiOS-Info.plist
@@ -153,6 +154,7 @@ targets:
       - AVFoundation
       - Vision
       - CoreImage
+      - VisionKit
       - Security
       - BackgroundTasks
     capabilities:
@@ -243,6 +245,9 @@ targets:
       - UIKit
       - XCTest
       - Vision
+      - VisionKit
+      - CoreML
+      - NaturalLanguage
       - AVFoundation
 
   FightCityAppTests:

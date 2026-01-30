@@ -7,6 +7,11 @@
 
 import AVFoundation
 import UIKit
+import VisionKit
+import FightCityFoundation
+
+/// APPLE INTELLIGENCE: Provide real-time frame guidance overlays via Live Text
+/// APPLE INTELLIGENCE: Integrate with DocumentScanCoordinator for intelligent capture
 
 /// Manages camera capture with full control over exposure, focus, torch, and stabilization
 actor CameraManager: NSObject {
@@ -235,6 +240,85 @@ actor CameraManager: NSObject {
             }
             photoOutput.capturePhoto(with: settings, delegate: delegate)
         }
+    }
+    
+    // MARK: - Document Scanner Capture
+    
+    /// Capture using VisionKit Document Scanner with fallback to traditional camera
+    /// - Parameters:
+    ///   - viewController: The view controller to present the scanner from
+    ///   - coordinator: The document scanner coordinator to use
+    /// - Returns: True if document scanner was used, false if fallback to traditional camera
+    /// - Note: Requires iOS 16.0+
+    @available(iOS 16.0, *)
+    func captureWithDocumentScanner(from viewController: UIViewController, coordinator: DocumentScanCoordinator) async -> Bool {
+        // Check if we should use document scanner
+        if DocumentScanCoordinator.shouldUseDocumentScanner() {
+            // Use VisionKit Document Scanner
+            coordinator.presentScanner(from: viewController)
+            return true
+        } else {
+            // Fallback to traditional camera capture
+            print("Document scanner not available, falling back to traditional camera")
+            
+            // Stop current session if running
+            if isSessionRunning {
+                stopSession()
+            }
+            
+            do {
+                // Setup and start session for fallback capture
+                try setupSession()
+                startSession()
+                
+                // Wait a moment for camera to stabilize
+                try await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
+                
+                // Try to capture photo
+                guard let imageData = try await capturePhoto() else {
+                    throw CameraError.captureFailed
+                }
+                
+                // Stop session after capture
+                stopSession()
+                
+                // Create a mock scan result to match the document scanner interface
+                let mockImage = UIImage(data: imageData)!
+                let scanResult = DocumentScanResult(
+                    image: mockImage,
+                    pageIndex: 0,
+                    totalPages: 1,
+                    processingTime: 0,
+                    enhancementApplied: false,
+                    scanQuality: .medium
+                )
+                
+                // Notify delegate with success
+                coordinator.delegate?.documentScanCoordinator(coordinator, didFinishWith: .success(scanResult))
+                return false
+                
+            } catch {
+                // Stop session on error
+                stopSession()
+                
+                // Notify delegate with error
+                if let cameraError = error as? CameraError {
+                    let documentError = DocumentScanError.scanFailed(cameraError)
+                    coordinator.delegate?.documentScanCoordinator(coordinator, didFailWith: documentError)
+                } else {
+                    let documentError = DocumentScanError.scanFailed(error)
+                    coordinator.delegate?.documentScanCoordinator(coordinator, didFailWith: documentError)
+                }
+                return false
+            }
+        }
+    }
+    
+    /// Check if document scanner is recommended for current device/configuration
+    /// - Note: Requires iOS 16.0+
+    @available(iOS 16.0, *)
+    static func isDocumentScannerRecommended() -> Bool {
+        return DocumentScanCoordinator.shouldUseDocumentScanner()
     }
     
     // MARK: - Image Processing
