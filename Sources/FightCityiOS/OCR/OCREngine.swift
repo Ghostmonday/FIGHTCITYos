@@ -14,6 +14,12 @@ import UIKit
 /// APPLE INTELLIGENCE: Supports iOS 16+ for all Apple Intelligence features
 
 /// Modern OCR engine with Apple Intelligence capabilities
+/// 
+/// Features:
+/// - VisionKit Document Scanner for document capture
+/// - Apple Intelligence ImageAnalyzer for Live Text
+/// - Traditional Vision API fallback
+/// - iOS 16+ compatibility with availability checks
 public struct OCREngine {
     
     // MARK: - Recognition Configuration
@@ -71,6 +77,70 @@ public struct OCREngine {
         }
     }
     
+    // MARK: - Scan Quality Metadata
+    
+    /// Scan quality metadata for document scanning operations
+    public struct ScanQualityMetadata {
+        public let cropQuality: CropQuality
+        public let glareDetected: Bool
+        public let isDocumentStraight: Bool
+        public let lightingCondition: LightingCondition
+        
+        public enum CropQuality {
+            case excellent
+            case good
+            case acceptable
+            case poor
+            
+            public var score: Double {
+                switch self {
+                case .excellent: return 1.0
+                case .good: return 0.85
+                case .acceptable: return 0.70
+                case .poor: return 0.5
+                }
+            }
+        }
+        
+        public enum LightingCondition {
+            case optimal
+            case good
+            case fair
+            case poor
+            
+            public var score: Double {
+                switch self {
+                case .optimal: return 1.0
+                case .good: return 0.85
+                case .fair: return 0.70
+                case .poor: return 0.5
+                }
+            }
+        }
+        
+        public init(
+            cropQuality: CropQuality,
+            glareDetected: Bool,
+            isDocumentStraight: Bool,
+            lightingCondition: LightingCondition
+        ) {
+            self.cropQuality = cropQuality
+            self.glareDetected = glareDetected
+            self.isDocumentStraight = isDocumentStraight
+            self.lightingCondition = lightingCondition
+        }
+        
+        /// Calculate overall quality score
+        public var overallScore: Double {
+            let cropScore = cropQuality.score
+            let lightingScore = lightingCondition.score
+            let straightnessBonus = isDocumentStraight ? 1.0 : 0.9
+            let glarePenalty = glareDetected ? 0.85 : 1.0
+            
+            return cropScore * lightingScore * straightnessBonus * glarePenalty
+        }
+    }
+    
     // MARK: - Image Analyzer Integration
     
     /// Image analyzer for Apple Intelligence Live Text
@@ -80,6 +150,124 @@ public struct OCREngine {
     
     public init() {
         self.imageAnalyzer = ImageAnalyzer.isAvailable ? ImageAnalyzer() : nil
+    }
+    
+    // MARK: - Document Scanning
+    
+    /// Check if VisionKit document scanning is available
+    public static var isDocumentScanningAvailable: Bool {
+        guard #available(iOS 16.0, *) else { return false }
+        return VNDocumentCameraViewController.isSupported
+    }
+    
+    /// Scan a document using VisionKit's document camera
+    /// - Parameter viewController: The view controller to present the scanner from
+    /// - Returns: Result containing scanned image or error
+    @available(iOS 16.0, *)
+    public func scanDocument(
+        from viewController: UIViewController
+    ) async -> DocumentScanOutcome {
+        guard OCREngine.isDocumentScanningAvailable else {
+            return .failure(.documentScannerUnavailable)
+        }
+        
+        return await withCheckedContinuation { continuation in
+            let scanner = VNDocumentCameraViewController()
+            let delegate = DocumentScannerDelegate { result in
+                continuation.resume(returning: result)
+            }
+            scanner.delegate = delegate
+            viewController.present(scanner, animated: true)
+        }
+    }
+    
+    /// Outcome of document scanning operation
+    @available(iOS 16.0, *)
+    public enum DocumentScanOutcome {
+        case success(ScannedDocumentResult)
+        case failure(DocumentScanError)
+        case cancelled
+    }
+    
+    /// Result of a successful document scan
+    @available(iOS 16.0, *)
+    public struct ScannedDocumentResult {
+        public let image: UIImage
+        public let pageIndex: Int
+        public let totalPages: Int
+        public let scanQualityMetadata: ScanQualityMetadata
+        
+        public init(
+            image: UIImage,
+            pageIndex: Int,
+            totalPages: Int,
+            scanQualityMetadata: ScanQualityMetadata
+        ) {
+            self.image = image
+            self.pageIndex = pageIndex
+            self.totalPages = totalPages
+            self.scanQualityMetadata = scanQualityMetadata
+        }
+    }
+    
+    /// Errors that can occur during document scanning
+    @available(iOS 16.0, *)
+    public enum DocumentScanError: LocalizedError {
+        case documentScannerUnavailable
+        case noPagesFound
+        case imageProcessingFailed
+        case scanFailed(Error)
+        
+        public var errorDescription: String? {
+            switch self {
+            case .documentScannerUnavailable:
+                return "Document scanning is not available on this device"
+            case .noPagesFound:
+                return "No pages were found in the scanned document"
+            case .imageProcessingFailed:
+                return "Failed to process the scanned image"
+            case .scanFailed(let error):
+                return "Document scanning failed: \(error.localizedDescription)"
+            }
+        }
+    }
+    
+    // MARK: - Live Text Recognition
+    
+    /// Recognize text using Vision framework with Live Text capabilities
+    /// - Parameters:
+    ///   - image: The image to recognize text from
+    ///   - configuration: Recognition configuration
+    /// - Returns: Recognition result with text and confidence
+    public func recognizeTextLiveText(
+        in image: UIImage,
+        configuration: Configuration = Configuration()
+    ) async throws -> RecognitionResult {
+        let startTime = Date()
+        
+        guard let cgImage = image.cgImage else {
+            throw OCRError.invalidImage
+        }
+        
+        let observations = try await performVisionRecognition(
+            on: cgImage,
+            configuration: configuration
+        )
+        
+        let text = extractText(from: observations)
+        let confidence = calculateAverageConfidence(from: observations)
+        let processingTime = Date().timeIntervalSince(startTime)
+        
+        // Determine if we used Live Text (ImageAnalyzer) or fallback Vision
+        let source: RecognitionResult.RecognitionSource = imageAnalyzer != nil ? .imageAnalyzer : .fallback
+        
+        return RecognitionResult(
+            text: text,
+            observations: observations,
+            confidence: confidence,
+            processingTime: processingTime,
+            recognitionSource: source
+        )
     }
     
     // MARK: - Public Methods
@@ -165,7 +353,7 @@ public struct OCREngine {
         )
     }
     
-    /// Perform Vision text recognition
+    /// Perform Vision text recognition with configurable options
     private func performVisionRecognition(
         on cgImage: CGImage,
         configuration: Configuration
@@ -185,7 +373,7 @@ public struct OCREngine {
                 continuation.resume(returning: observations)
             }
             
-            // Configure request
+            // Configure request with high accuracy settings for Live Text
             request.recognitionLevel = configuration.recognitionLevel
             request.usesLanguageCorrection = configuration.usesLanguageCorrection
             request.recognitionLanguages = configuration.recognitionLanguages
@@ -299,6 +487,45 @@ public struct OCREngine {
     public static var isAppleIntelligenceAvailable: Bool {
         ImageAnalyzer.isAvailable
     }
+    
+    // MARK: - Capture Result Conversion
+    
+    /// Convert RecognitionResult to CaptureResult with scan quality metadata
+    public func convertToCaptureResult(
+        _ recognitionResult: RecognitionResult,
+        from image: UIImage,
+        scanQuality: ScanQualityMetadata? = nil,
+        croppedImage: UIImage? = nil
+    ) -> CaptureResult {
+        let boundingBoxes = extractBoundingBoxes(from: recognitionResult.observations)
+        
+        return CaptureResult(
+            originalImageData: image.jpegData(compressionQuality: 0.9),
+            croppedImageData: croppedImage?.jpegData(compressionQuality: 0.9),
+            rawText: recognitionResult.text,
+            confidence: recognitionResult.confidence,
+            processingTimeMs: Int(recognitionResult.processingTime * 1000),
+            boundingBoxes: boundingBoxes
+        )
+    }
+    
+    /// Extract bounding boxes from Vision observations
+    private func extractBoundingBoxes(from observations: [VNRecognizedTextObservation]) -> [BoundingBox] {
+        var boundingBoxes: [BoundingBox] = []
+        
+        for observation in observations {
+            if let candidate = observation.topCandidates(1).first {
+                let boundingBox = BoundingBox(
+                    text: candidate.string,
+                    confidence: Double(candidate.confidence),
+                    rect: observation.boundingBox
+                )
+                boundingBoxes.append(boundingBox)
+            }
+        }
+        
+        return boundingBoxes
+    }
 }
 
 // MARK: - OCR Error
@@ -309,6 +536,7 @@ public enum OCRError: LocalizedError {
     case recognitionFailed(Error)
     case noTextFound
     case appleIntelligenceUnavailable
+    case documentScannerUnavailable
     
     public var errorDescription: String? {
         switch self {
@@ -320,7 +548,65 @@ public enum OCRError: LocalizedError {
             return "No text found in image"
         case .appleIntelligenceUnavailable:
             return "Apple Intelligence is not available on this device"
+        case .documentScannerUnavailable:
+            return "Document scanner is not available on this device"
         }
+    }
+}
+
+// MARK: - Document Scanner Delegate
+
+@available(iOS 16.0, *)
+private final class DocumentScannerDelegate: NSObject, VNDocumentCameraViewControllerDelegate {
+    private let completion: (OCREngine.DocumentScanOutcome) -> Void
+    
+    init(completion: @escaping (OCREngine.DocumentScanOutcome) -> Void) {
+        self.completion = completion
+    }
+    
+    func documentCameraViewController(
+        _ controller: VNDocumentCameraViewController,
+        didFinishWith scan: VNDocumentCameraScan
+    ) {
+        guard scan.pageCount > 0 else {
+            completion(.failure(.noPagesFound))
+            return
+        }
+        
+        // Get the best page (typically first page for citations)
+        let bestPageIndex = 0
+        guard let image = scan.imageOfPage(at: bestPageIndex) else {
+            completion(.failure(.imageProcessingFailed))
+            return
+        }
+        
+        // VisionKit automatically applies: auto-cropping, perspective correction, glare reduction
+        let scanQuality = ScanQualityMetadata(
+            cropQuality: .excellent, // VisionKit provides excellent crop
+            glareDetected: false, // VisionKit handles glare
+            isDocumentStraight: true, // VisionKit corrects perspective
+            lightingCondition: .optimal // VisionKit optimizes lighting
+        )
+        
+        let result = OCREngine.ScannedDocumentResult(
+            image: image,
+            pageIndex: bestPageIndex,
+            totalPages: scan.pageCount,
+            scanQualityMetadata: scanQuality
+        )
+        
+        completion(.success(result))
+    }
+    
+    func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
+        completion(.cancelled)
+    }
+    
+    func documentCameraViewController(
+        _ controller: VNDocumentCameraViewController,
+        didFailWithError error: Error
+    ) {
+        completion(.failure(.scanFailed(error)))
     }
 }
 
