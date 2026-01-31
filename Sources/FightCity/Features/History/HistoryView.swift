@@ -59,6 +59,25 @@ public struct HistoryView: View {
     }
     
     private var filterMenu: some View {
+        // TODO: PHASE 2, TASK 2.3 - Implement history filtering
+        // Current: UI exists but filtering is not wired
+        // Required filters:
+        // 1. By city (SF, LA, NYC, Denver, All)
+        // 2. By status (All, Pending, Submitted, Resolved)
+        // 3. By date range (Last 7 days, Last 30 days, Last year, All time)
+        //
+        // Implementation:
+        // var filteredCitations: [Citation] {
+        //     citations.filter { citation in
+        //         // City filter
+        //         if selectedCity != "All", citation.city != selectedCity { return false }
+        //         // Status filter
+        //         if selectedStatus != "All", citation.status != selectedStatus { return false }
+        //         // Date filter
+        //         if let startDate = dateRangeStart, citation.date < startDate { return false }
+        //         return true
+        //     }
+        // }
         Menu {
             ForEach(CitationFilter.allCases, id: \.self) { filter in
                 Button(action: {

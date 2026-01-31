@@ -16,6 +16,28 @@ import FightCityFoundation
 /// APPLE INTELLIGENCE: Uses NLTagger for text quality assessment
 /// APPLE INTELLIGENCE: Enhances layout analysis confidence with ML
 
+// APPLE INTELLIGENCE TODO: Enhance confidence scoring with NaturalLanguage framework
+// Current: Pattern-based confidence (length, format, known patterns)
+// Enhancement: Add linguistic analysis using NLTagger
+//
+// Additional confidence signals:
+// 1. Language identification (should be English for US citations)
+// 2. Dominant script (should be Latin)
+// 3. Sentence structure quality
+// 4. Presence of common citation keywords (parking, violation, fine, etc.)
+//
+// Implementation:
+// import NaturalLanguage
+// let tagger = NLTagger(tagSchemes: [.language, .script, .lexicalClass])
+// tagger.string = text
+// let (language, _) = tagger.tag(at: text.startIndex, unit: .paragraph, scheme: .language)
+// if language == .english { confidenceBoost += 0.1 }
+//
+// Check for citation keywords:
+// let keywords = ["parking", "violation", "citation", "ticket", "fine", "sfmta", "ladot"]
+// let keywordCount = keywords.filter { text.lowercased().contains($0) }.count
+// confidenceBoost += Double(keywordCount) * 0.05
+
 /// Scores and evaluates OCR confidence with ML enhancement
 public struct ConfidenceScorer {
     

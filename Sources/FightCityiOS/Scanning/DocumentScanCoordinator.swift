@@ -1,3 +1,15 @@
+// APPLE INTELLIGENCE IMPLEMENTATION - VisionKit Document Scanner
+// Status: ✅ Implemented
+// This coordinator handles VisionKit's VNDocumentCameraViewController
+// with automatic fallback to traditional camera on unsupported devices.
+//
+// Testing checklist:
+// - [ ] Test on device with iOS 16+ (Simulator doesn't support camera)
+// - [ ] Verify auto-cropping works
+// - [ ] Verify perspective correction works
+// - [ ] Test fallback on iOS 15 devices
+// - [ ] Test "not available" path (airplane mode, restricted camera)
+
 //
 //  DocumentScanCoordinator.swift
 //  FightCityiOS

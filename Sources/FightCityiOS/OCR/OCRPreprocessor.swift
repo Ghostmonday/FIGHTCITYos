@@ -11,6 +11,24 @@ import UIKit
 /// APPLE INTELLIGENCE: Largely superseded by VisionKit preprocessing
 /// APPLE INTELLIGENCE: Retain as fallback for unsupported devices
 
+// APPLE INTELLIGENCE NOTE: This preprocessor is now FALLBACK ONLY
+// VisionKit Document Scanner handles preprocessing automatically:
+// - Perspective correction
+// - Glare reduction
+// - Auto-cropping
+// - Enhancement
+//
+// This class should only run when:
+// 1. Document scanner unavailable (iOS < 16)
+// 2. User chooses manual camera capture
+// 3. Feature flag disables document scanner
+//
+// TODO: Add check at beginning of preprocess():
+// if FeatureFlags.isVisionKitDocumentScannerEnabled && iOS16+ {
+//     Logger.shared.info("Skipping preprocessing - Document scanner already enhanced image")
+//     return image // Return original, already enhanced by VisionKit
+// }
+
 /// Preprocesses images for optimal OCR results
 public struct OCRPreprocessor {
     private let context = CIContext()

@@ -70,6 +70,25 @@ public struct CaptureView: View {
     
     // MARK: - Camera Preview
     
+    // TODO: PHASE 1, TASK 1.1 - Wire actual CameraPreviewView
+    // Current state: Placeholder Rectangle with camera icon
+    // Required changes:
+    // 1. Replace Rectangle() with CameraPreviewView(cameraManager: viewModel.cameraManager)
+    // 2. Add overlay with capture controls (flash, zoom, switch camera)
+    // 3. Wire document scanner button if available
+    // 4. Test on device (camera doesn't work in Simulator)
+    //
+    // Example implementation:
+    // if #available(iOS 16.0, *), viewModel.isDocumentScannerAvailable() {
+    //     Button("Scan Document") { 
+    //         Task { await viewModel.captureWithDocumentScanner(from: viewController) }
+    //     }
+    // } else {
+    //     CameraPreviewView(cameraManager: viewModel.cameraManager)
+    //         .overlay(alignment: .bottom) {
+    //             Button("Capture") { Task { await viewModel.capturePhoto() } }
+    //         }
+    // }
     private var cameraPreview: some View {
         // Placeholder for camera preview
         // In real implementation, would use CameraPreviewView

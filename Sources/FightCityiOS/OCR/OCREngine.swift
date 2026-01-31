@@ -13,6 +13,33 @@ import UIKit
 /// APPLE INTELLIGENCE: Falls back to traditional Vision API for compatibility
 /// APPLE INTELLIGENCE: Supports iOS 16+ for all Apple Intelligence features
 
+// APPLE INTELLIGENCE TODO: Migrate to Live Text API
+// Current: Uses Vision framework's VNRecognizeTextRequest (legacy)
+// Target: Use VisionKit ImageAnalyzer with .text analysis type (iOS 16+)
+//
+// Why migrate?
+// - Live Text is Apple's modern OCR with better accuracy
+// - Real-time recognition capabilities
+// - Better handling of multilingual text
+// - Integrated with iOS system features
+//
+// Implementation guide:
+// 1. Import VisionKit
+// 2. Create ImageAnalyzer instance
+// 3. Use analyzer.analyze(image, configuration: .init(types: [.text]))
+// 4. Extract text from ImageAnalysis.transcript
+// 5. Keep current Vision implementation as fallback for iOS 15
+//
+// @available(iOS 16.0, *)
+// private func recognizeWithLiveText(_ image: UIImage) async -> String {
+//     let analyzer = ImageAnalyzer()
+//     let configuration = ImageAnalyzer.Configuration([.text])
+//     if let analysis = try? await analyzer.analyze(image, configuration: configuration) {
+//         return analysis.transcript
+//     }
+//     return ""
+// }
+
 /// Modern OCR engine with Apple Intelligence capabilities
 /// 
 /// Features:

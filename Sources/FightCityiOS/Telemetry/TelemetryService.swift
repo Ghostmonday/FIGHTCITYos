@@ -111,6 +111,7 @@ public final class TelemetryService: ObservableObject {
             pendingCount = storage.pendingCount()
             lastUploadDate = Date()
         } catch {
+            // TODO: Replace with Logger.shared.error("Telemetry upload failed", error: error)
             print("Telemetry upload failed: \(error)")
         }
     }
