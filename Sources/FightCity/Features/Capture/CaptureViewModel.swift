@@ -367,6 +367,7 @@ public final class CaptureViewModel: ObservableObject, DocumentScanCoordinatorDe
     
     public func documentScanCoordinator(_ coordinator: DocumentScanCoordinator, didFailWith error: DocumentScanError) {
         // Log the error and provide user feedback
+        // TODO: Replace with Logger.shared.error("Document scan failed", error: error)
         print("Document scan failed: \(error.localizedDescription)")
         
         // Provide specific error messages based on error type
