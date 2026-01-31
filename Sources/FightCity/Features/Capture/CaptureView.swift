@@ -85,7 +85,7 @@ public struct CaptureView: View {
         GeometryReader { geometry in
             ZStack {
                 // Camera preview (real camera when running on device)
-                CameraPreviewRepresentable(session: viewModel.cameraManager.session)
+                CameraPreviewViewWrapper(viewModel: viewModel)
                     .ignoresSafeArea()
                 
                 // Darkening overlay outside scan area
@@ -263,7 +263,14 @@ public struct CaptureView: View {
                 // Flash toggle
                 Button(action: {
                     FCHaptics.lightImpact()
-                    showFlash.toggle()
+                    Task {
+                        do {
+                            try await viewModel.cameraManager.toggleTorch()
+                            showFlash.toggle()
+                        } catch {
+                            // Torch unavailable on this device
+                        }
+                    }
                 }) {
                     Image(systemName: showFlash ? "bolt.fill" : "bolt.slash.fill")
                         .font(.system(size: 18, weight: .medium))
@@ -272,6 +279,8 @@ public struct CaptureView: View {
                         .background(Color.black.opacity(0.5))
                         .clipShape(Circle())
                 }
+                .accessibilityLabel("Toggle flash")
+                .accessibilityHint("Turns the camera flash on or off")
                 
                 // Manual entry
                 Button(action: {
@@ -473,47 +482,15 @@ public struct CaptureView: View {
     }
 }
 
-// MARK: - Camera Preview Representable
+// MARK: - Camera Preview View Wrapper
 
-struct CameraPreviewRepresentable: UIViewRepresentable {
-    let session: AVCaptureSession
+struct CameraPreviewViewWrapper: View {
+    @ObservedObject var viewModel: CaptureViewModel
     
-    func makeUIView(context: Context) -> UIView {
-        let view = CameraPreviewUIView()
-        view.session = session
-        return view
-    }
-    
-    func updateUIView(_ uiView: UIView, context: Context) {}
-}
-
-class CameraPreviewUIView: UIView {
-    var session: AVCaptureSession? {
-        didSet {
-            if let session = session {
-                let previewLayer = AVCaptureVideoPreviewLayer(session: session)
-                previewLayer.videoGravity = .resizeAspectFill
-                previewLayer.frame = bounds
-                layer.addSublayer(previewLayer)
-            }
-        }
-    }
-    
-    override func layoutSubviews() {
-        super.layoutSubviews()
-        layer.sublayers?.forEach { sublayer in
-            sublayer.frame = bounds
-        }
-    }
-}
-
-// MARK: - CameraManager Session Extension
-
-extension CameraManager {
-    var session: AVCaptureSession {
-        // Return the capture session from CameraManager
-        // This would need to be exposed from the CameraManager class
-        AVCaptureSession()
+    var body: some View {
+        // Use the session directly from camera manager
+        // Session is nonisolated so we can access it synchronously
+        CameraPreviewView(session: viewModel.cameraManager.session)
     }
 }
 

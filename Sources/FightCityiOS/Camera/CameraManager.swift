@@ -28,6 +28,12 @@ public actor CameraManager: NSObject {
     private var videoOutput: AVCaptureVideoDataOutput?
     private var previewLayer: AVCaptureVideoPreviewLayer?
     
+    /// Expose capture session for preview layer
+    /// Note: Nonisolated because AVCaptureSession is thread-safe
+    public nonisolated var session: AVCaptureSession {
+        captureSession
+    }
+    
     // MARK: - Device Configuration
     
     private var currentDevice: AVCaptureDevice? {
