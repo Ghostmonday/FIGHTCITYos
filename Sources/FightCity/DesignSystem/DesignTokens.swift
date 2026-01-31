@@ -166,7 +166,7 @@ extension View {
     }
     
     /// Apply animation
-    public func animate(_ token: FCAnimation.Type = FCAnimation.self, _ animation: FCAnimation.Type = FCAnimation.self) -> some View {
-        animation(.smooth)
+    public func animate(_ animation: Animation = FCAnimation.smooth) -> some View {
+        self.animation(animation)
     }
 }

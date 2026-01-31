@@ -711,8 +711,8 @@ public final class AppealWriter {
 
 extension AppealWriter {
     /// Generate a preview of the appeal
-    public func generatePreview(for context: AppealContext, maxLength: Int = 200) -> String {
-        let result = generateAppeal(for: context)
+    public func generatePreview(for context: AppealContext, maxLength: Int = 200) async -> String {
+        let result = await generateAppeal(for: context)
         let preview = String(result.appealText.prefix(maxLength))
         return preview + (result.appealText.count > maxLength ? "..." : "")
     }

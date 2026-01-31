@@ -48,7 +48,7 @@ public final class CaptureViewModel: ObservableObject, DocumentScanCoordinatorDe
     
     // MARK: - Dependencies
     
-    private let cameraManager: CameraManager
+    let cameraManager: CameraManager
     private let documentScanner = DocumentScanCoordinator()
     private let frameAnalyzer = FrameQualityAnalyzer()
     private let apiClient = APIClient.shared

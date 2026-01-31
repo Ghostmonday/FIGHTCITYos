@@ -10,9 +10,15 @@ import AVFoundation
 
 /// UIKit camera preview view wrapped for SwiftUI
 public struct CameraPreviewView: UIViewRepresentable {
-    let session: AVCaptureSession
-    var showBoundingBoxes: Bool = false
-    var boundingBoxes: [BoundingBoxOverlayData] = []
+    public let session: AVCaptureSession
+    public var showBoundingBoxes: Bool = false
+    public var boundingBoxes: [BoundingBoxOverlayData] = []
+    
+    public init(session: AVCaptureSession, showBoundingBoxes: Bool = false, boundingBoxes: [BoundingBoxOverlayData] = []) {
+        self.session = session
+        self.showBoundingBoxes = showBoundingBoxes
+        self.boundingBoxes = boundingBoxes
+    }
     
     public func makeUIView(context: Context) -> CameraPreviewUIView {
         let view = CameraPreviewUIView()

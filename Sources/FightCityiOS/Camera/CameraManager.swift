@@ -210,7 +210,7 @@ public actor CameraManager: NSObject {
         device.unlockForConfiguration()
     }
     
-    func toggleTorch() async throws {
+    public func toggleTorch() async throws {
         let newLevel: Float = torchLevel > 0 ? 0 : 1
         try await setTorch(level: newLevel)
     }
