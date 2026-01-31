@@ -2,310 +2,444 @@
 //  Components.swift
 //  FightCity
 //
-//  Reusable UI components
+//  Premium UI components with haptics, animations, and polish
 //
 
 import SwiftUI
 import FightCityFoundation
 
-// MARK: - Primary Button
+// MARK: - FCButton
 
-public struct PrimaryButton: View {
-    let title: String
-    let action: () -> Void
-    var isEnabled: Bool = true
-    var isLoading: Bool = false
+/// Premium button with haptic feedback and loading states
+/// TIP: Always use FCButton instead of SwiftUI Button for consistent UX
+/// The haptic feedback is built-in and makes interactions feel premium
+public struct FCButton: View {
+    public enum ButtonStyle {
+        case primary
+        case secondary
+        case ghost
+        case destructive
+    }
     
-    public init(title: String, action: @escaping () -> Void, isEnabled: Bool = true, isLoading: Bool = false) {
+    private let title: String
+    private let action: () -> Void
+    private let style: ButtonStyle
+    private let isEnabled: Bool
+    private let isLoading: Bool
+    private let icon: String?
+    
+    public init(
+        _ title: String,
+        style: ButtonStyle = .primary,
+        isEnabled: Bool = true,
+        isLoading: Bool = false,
+        icon: String? = nil,
+        action: @escaping () -> Void
+    ) {
         self.title = title
         self.action = action
+        self.style = style
         self.isEnabled = isEnabled
         self.isLoading = isLoading
+        self.icon = icon
     }
     
     public var body: some View {
-        Button(action: action) {
-            HStack(spacing: 8) {
+        Button(action: {
+            FCHaptics.primaryButtonTap()
+            action()
+        }) {
+            HStack(spacing: FCSpacing.xs) {
                 if isLoading {
                     ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                        .progressViewStyle(CircularProgressViewStyle(tint: foregroundColor))
+                        .scaleEffect(0.9)
+                } else if let icon = icon {
+                    Image(systemName: icon)
+                        .font(.system(size: 18, weight: .semibold))
                 }
+                
                 Text(title)
                     .font(AppTypography.labelLarge)
+                    .fontWeight(.semibold)
             }
             .frame(maxWidth: .infinity)
-            .padding(.vertical, 16)
-            .padding(.horizontal, 24)
-            .background(isEnabled ? Color.accentColor : Color.gray)
-            .foregroundColor(.white)
-            .cornerRadius(12)
+            .frame(height: FCSize.buttonHeight)
+            .foregroundColor(foregroundColor)
+            .background(background)
+            .cornerRadius(FCRadius.button)
+            .shadow(color: shadowColor, radius: 4, x: 0, y: 2)
+            .opacity(opacity)
         }
         .disabled(!isEnabled || isLoading)
     }
+    
+    private var foregroundColor: Color {
+        switch style {
+        case .primary, .destructive:
+            return .white
+        case .secondary:
+            return AppColors.primary
+        case .ghost:
+            return AppColors.primary
+        }
+    }
+    
+    private var background: Color {
+        switch style {
+        case .primary:
+            return AppColors.primary
+        case .secondary:
+            return AppColors.surface
+        case .ghost:
+            return .clear
+        case .destructive:
+            return AppColors.error
+        }
+    }
+    
+    private var shadowColor: Color {
+        switch style {
+        case .primary, .destructive:
+            return AppColors.primary.opacity(0.3)
+        case .secondary, .ghost:
+            return .clear
+        }
+    }
+    
+    private var opacity: Double {
+        if !isEnabled { return FCOpacity.disabled }
+        return 1.0
+    }
 }
 
-// MARK: - Secondary Button
+// MARK: - FCCard
 
-public struct SecondaryButton: View {
-    let title: String
-    let action: () -> Void
-    var isEnabled: Bool = true
+/// Premium glassmorphism card with subtle shadow
+/// TIP: Use FCCard instead of plain VStacks for content sections
+/// The shadow and rounded corners give depth and polish
+public struct FCCard<Content: View>: View {
+    private let content: Content
+    private let hasPadding: Bool
+    private let cornerRadius: CGFloat
+    private let shadowStyle: FCShadow.ShadowToken?
     
-    public init(title: String, action: @escaping () -> Void, isEnabled: Bool = true) {
-        self.title = title
-        self.action = action
-        self.isEnabled = isEnabled
+    public init(
+        hasPadding: Bool = true,
+        cornerRadius: CGFloat = FCRadius.card,
+        shadow: FCShadow.ShadowToken? = FCShadow.card,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.content = content()
+        self.hasPadding = hasPadding
+        self.cornerRadius = cornerRadius
+        self.shadowStyle = shadow
     }
     
     public var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(AppTypography.labelLarge)
-                .frame(maxWidth: .infinity)
-                .padding(.vertical, 16)
-                .padding(.horizontal, 24)
-                .background(Color.clear)
-                .foregroundColor(.accentColor)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 12)
-                        .stroke(Color.accentColor, lineWidth: 2)
-                )
-        }
-        .disabled(!isEnabled)
+        content
+            .if(hasPadding) { view in
+                view.padding(FCSpacing.cardPadding)
+            }
+            .background(AppColors.surface)
+            .cornerRadius(cornerRadius)
+            .if let shadow = shadowStyle { view in
+                shadow.apply(to: view)
+            }
     }
 }
 
-// MARK: - Card View
+// MARK: - FCHeroSection
 
-public struct CardView<Content: View>: View {
-    let content: Content
+/// Hero section with gradient background
+/// TIP: Use this for major screen headers - the gradient draws attention
+/// Perfect for Onboarding, Home screen welcome, and feature highlights
+public struct FCHeroSection<Content: View>: View {
+    private let title: String
+    private let subtitle: String?
+    private let icon: String?
+    private let gradient: LinearGradient
+    private let content: Content
     
-    public init(@ViewBuilder content: () -> Content) {
+    public init(
+        title: String,
+        subtitle: String? = nil,
+        icon: String? = nil,
+        gradient: LinearGradient = AppColors.primaryGradient,
+        @ViewBuilder content: () -> Content
+    ) {
+        self.title = title
+        self.subtitle = subtitle
+        self.icon = icon
+        self.gradient = gradient
         self.content = content()
     }
     
     public var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(spacing: FCSpacing.md) {
+            if let icon = icon {
+                Image(systemName: icon)
+                    .font(.system(size: 48))
+                    .foregroundColor(.white.opacity(0.9))
+            }
+            
+            Text(title)
+                .font(AppTypography.displaySmall)
+                .fontWeight(.bold)
+                .foregroundColor(.white)
+                .multilineTextAlignment(.center)
+            
+            if let subtitle = subtitle {
+                Text(subtitle)
+                    .font(AppTypography.bodyLarge)
+                    .foregroundColor(.white.opacity(0.8))
+                    .multilineTextAlignment(.center)
+            }
+            
             content
         }
-        .padding(20)
-        .background(Color(.systemBackground))
-        .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 2)
+        .frame(maxWidth: .infinity)
+        .padding(FCSpacing.xxl)
+        .background(gradient)
+        .cornerRadius(FCRadius.lg)
     }
 }
 
-// MARK: - Citation Card
+// MARK: - FCBadge
 
-public struct CitationCard: View {
-    let citation: Citation
-    let onTap: () -> Void
+/// Animated status badge
+/// TIP: Use FCBadge for citation status, deadlines, and category labels
+/// The animation adds delight - don't overuse it though!
+public struct FCBadge: View {
+    public enum BadgeStyle {
+        case primary
+        case success
+        case warning
+        case error
+        case info
+        case neutral
+    }
     
-    public init(citation: Citation, onTap: @escaping () -> Void) {
-        self.citation = citation
-        self.onTap = onTap
+    private let text: String
+    private let style: BadgeStyle
+    private let isAnimated: Bool
+    
+    public init(_ text: String, style: BadgeStyle = .neutral, isAnimated: Bool = true) {
+        self.text = text
+        self.style = style
+        self.isAnimated = isAnimated
     }
     
     public var body: some View {
-        Button(action: onTap) {
-            CardView {
-                HStack {
-                    VStack(alignment: .leading, spacing: 8) {
-                        Text(citation.citationNumber)
-                            .font(AppTypography.citationNumber)
-                            .foregroundColor(.primary)
-                        
-                        if let cityName = citation.cityName {
-                            Text(cityName)
-                                .font(AppTypography.bodyMedium)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    
-                    Spacer()
-                    
-                    StatusBadge(status: citation.status)
+        Text(text)
+            .font(AppTypography.labelSmall)
+            .fontWeight(.semibold)
+            .padding(.horizontal, FCSpacing.sm)
+            .padding(.vertical, FCSpacing.xxs)
+            .background(backgroundColor)
+            .foregroundColor(foregroundColor)
+            .cornerRadius(FCRadius.full)
+            .scaleEffect(isAnimated ? 1.0 : 1.0)
+            .animation(isAnimated ? FCAnimation.spring : .none, value: text)
+    }
+    
+    private var backgroundColor: Color {
+        switch style {
+        case .primary: return AppColors.primary.opacity(0.15)
+        case .success: return AppColors.success.opacity(0.15)
+        case .warning: return AppColors.warning.opacity(0.15)
+        case .error: return AppColors.error.opacity(0.15)
+        case .info: return AppColors.info.opacity(0.15)
+        case .neutral: return AppColors.surfaceVariant
+        }
+    }
+    
+    private var foregroundColor: Color {
+        switch style {
+        case .primary: return AppColors.primary
+        case .success: return AppColors.success
+        case .warning: return AppColors.warning
+        case .error: return AppColors.error
+        case .info: return AppColors.info
+        case .neutral: return AppColors.textPrimary
+        }
+    }
+}
+
+// MARK: - FCProgressRing
+
+/// Animated confidence/progress ring
+public struct FCProgressRing: View {
+    private let progress: Double
+    private let lineWidth: CGFloat
+    private let gradient: LinearGradient
+    
+    public init(progress: Double, lineWidth: CGFloat = 6) {
+        self.progress = max(0, min(1, progress))
+        self.lineWidth = lineWidth
+        self.gradient = LinearGradient(
+            colors: [AppColors.success, AppColors.success.opacity(0.6)],
+            startPoint: .leading,
+            endPoint: .trailing
+        )
+    }
+    
+    public var body: some View {
+        ZStack {
+            Circle()
+                .stroke(AppColors.surfaceVariant, lineWidth: lineWidth)
+            
+            Circle()
+                .trim(from: 0, to: progress)
+                .stroke(gradient, style: StrokeStyle(lineWidth: lineWidth, lineCap: .round))
+                .rotationEffect(.degrees(-90))
+                .animation(FCAnimation.smooth, value: progress)
+        }
+    }
+}
+
+// MARK: - FCShimmer
+
+/// Skeleton loading shimmer effect
+/// TIP: Use this while loading data from APIs - much better than spinner
+/// Creates professional "loading state" that feels like a native app
+public struct FCShimmer: View {
+    private let isAnimating: Bool
+    
+    public init(isAnimating: Bool = true) {
+        self.isAnimating = isAnimating
+    }
+    
+    public var body: some View {
+        GeometryReader { geometry in
+            Rectangle()
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            AppColors.surfaceVariant,
+                            AppColors.surface,
+                            AppColors.surfaceVariant
+                        ],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
+                )
+                .mask(
+                    Rectangle()
+                        .frame(width: geometry.size.width * 0.6)
+                        .offset(x: isAnimating ? geometry.size.width : -geometry.size.width * 0.6)
+                )
+        }
+        .animation(
+            isAnimating ? Animation.linear(duration: 1.5).repeatForever(autoreverses: false) : .none,
+            value: isAnimating
+        )
+    }
+}
+
+// MARK: - FCIconButton
+
+/// Circular icon button with haptic feedback
+public struct FCIconButton: View {
+    private let icon: String
+    private let action: () -> Void
+    private let size: CGFloat
+    private let backgroundColor: Color
+    private let iconColor: Color
+    
+    public init(
+        _ icon: String,
+        size: CGFloat = FCSize.cornerIconSize,
+        backgroundColor: Color = AppColors.surface,
+        iconColor: Color = AppColors.textPrimary,
+        action: @escaping () -> Void
+    ) {
+        self.icon = icon
+        self.action = action
+        self.size = size
+        self.backgroundColor = backgroundColor
+        self.iconColor = iconColor
+    }
+    
+    public var body: some View {
+        Button(action: {
+            FCHaptics.lightImpact()
+            action()
+        }) {
+            Image(systemName: icon)
+                .font(.system(size: size * 0.4, weight: .medium))
+                .foregroundColor(iconColor)
+                .frame(width: size, height: size)
+                .background(backgroundColor)
+                .cornerRadius(size / 2)
+                .shadow(radius: 2, y: 1)
+        }
+    }
+}
+
+// MARK: - FCToggle
+
+/// Premium toggle with haptic feedback
+public struct FCToggle: View {
+    @Binding private var isOn: Bool
+    private let label: String
+    private let icon: String?
+    
+    public init(_ label: String, icon: String? = nil, isOn: Binding<Bool>) {
+        self._isOn = isOn
+        self.label = label
+        self.icon = icon
+    }
+    
+    public var body: some View {
+        Button(action: {
+            FCHaptics.selection()
+            isOn.toggle()
+        }) {
+            HStack {
+                if let icon = icon {
+                    Image(systemName: icon)
+                        .foregroundColor(AppColors.textSecondary)
+                        .frame(width: 24)
                 }
                 
-                HStack {
-                    if let deadline = citation.deadlineDate {
-                        Text("Due: \(deadline)")
-                            .font(AppTypography.labelMedium)
-                            .foregroundColor(.secondary)
-                    }
-                    
-                    Spacer()
-                    
-                    if let days = citation.daysRemaining {
-                        Text("\(days) days left")
-                            .font(AppTypography.labelMedium)
-                            .foregroundColor(Color.deadlineColor(for: citation.deadlineStatus))
-                    }
-                }
+                Text(label)
+                    .foregroundColor(AppColors.textPrimary)
+                
+                Spacer()
+                
+                Capsule()
+                    .fill(isOn ? AppColors.primary : AppColors.surfaceVariant)
+                    .frame(width: 52, height: 32)
+                    .overlay(
+                        Circle()
+                            .fill(Color.white)
+                            .padding(2)
+                            .offset(x: isOn ? 10 : -10)
+                    )
             }
         }
         .buttonStyle(PlainButtonStyle())
     }
 }
 
-// MARK: - Status Badge
+// MARK: - View Extension
 
-public struct StatusBadge: View {
-    let status: CitationStatus
-    
-    public init(status: CitationStatus) {
-        self.status = status
+extension View {
+    /// Apply card styling
+    public func asFCCard(cornerRadius: CGFloat = FCRadius.card) -> some View {
+        self
+            .background(AppColors.surface)
+            .cornerRadius(cornerRadius)
+            .shadow(color: Color.black.opacity(0.08), radius: 8, x: 0, y: 2)
     }
     
-    public var body: some View {
-        Text(status.displayName)
-            .font(AppTypography.labelSmall)
-            .fontWeight(.medium)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .background(Color.statusColor(for: status).opacity(0.15))
-            .foregroundColor(Color.statusColor(for: status))
-            .cornerRadius(8)
-    }
-}
-
-// MARK: - Confidence Indicator
-
-public struct ConfidenceIndicator: View {
-    let confidence: Double
-    let level: String
-    
-    public init(confidence: Double, level: String) {
-        self.confidence = confidence
-        self.level = level
-    }
-    
-    public var body: some View {
-        HStack(spacing: 8) {
-            Circle()
-                .fill(Color.confidenceColor(for: level))
-                .frame(width: 8, height: 8)
-            
-            Text("\(Int(confidence * 100))%")
-                .font(AppTypography.confidenceScore)
-                .foregroundColor(Color.confidenceColor(for: level))
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
-        .background(Color.confidenceColor(for: level).opacity(0.15))
-        .cornerRadius(8)
-    }
-}
-
-// MARK: - Loading Overlay
-
-public struct LoadingOverlay: View {
-    let message: String
-    let isShowing: Bool
-    
-    public init(message: String, isShowing: Bool) {
-        self.message = message
-        self.isShowing = isShowing
-    }
-    
-    public var body: some View {
-        if isShowing {
-            ZStack {
-                Color.black.opacity(0.4)
-                    .ignoresSafeArea()
-                
-                VStack(spacing: 16) {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                        .scaleEffect(1.5)
-                    
-                    Text(message)
-                        .font(AppTypography.bodyMedium)
-                        .foregroundColor(.white)
-                }
-                .padding(32)
-                .background(Color(.systemGray5))
-                .cornerRadius(16)
-            }
-        }
-    }
-}
-
-// MARK: - Empty State View
-
-public struct EmptyStateView: View {
-    let icon: String
-    let title: String
-    let message: String
-    let buttonTitle: String?
-    let buttonAction: (() -> Void)?
-    
-    public init(
-        icon: String,
-        title: String,
-        message: String,
-        buttonTitle: String? = nil,
-        buttonAction: (() -> Void)? = nil
-    ) {
-        self.icon = icon
-        self.title = title
-        self.message = message
-        self.buttonTitle = buttonTitle
-        self.buttonAction = buttonAction
-    }
-    
-    public var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: icon)
-                .font(.system(size: 48))
-                .foregroundColor(.secondary)
-            
-            Text(title)
-                .font(AppTypography.titleMedium)
-                .foregroundColor(.primary)
-            
-            Text(message)
-                .font(AppTypography.bodyMedium)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal)
-            
-            if let buttonTitle = buttonTitle, let buttonAction = buttonAction {
-                PrimaryButton(title: buttonTitle, action: buttonAction)
-                    .padding(.top, 8)
-            }
-        }
-        .padding(32)
-    }
-}
-
-// MARK: - Error View
-
-public struct ErrorView: View {
-    let message: String
-    let retryAction: () -> Void
-    
-    public init(message: String, retryAction: @escaping () -> Void) {
-        self.message = message
-        self.retryAction = retryAction
-    }
-    
-    public var body: some View {
-        VStack(spacing: 16) {
-            Image(systemName: "exclamationmark.triangle")
-                .font(.system(size: 48))
-                .foregroundColor(.orange)
-            
-            Text("Something went wrong")
-                .font(AppTypography.titleMedium)
-            
-            Text(message)
-                .font(AppTypography.bodyMedium)
-                .foregroundColor(.secondary)
-                .multilineTextAlignment(.center)
-            
-            PrimaryButton(title: "Try Again", action: retryAction)
-        }
-        .padding(32)
+    /// Apply shimmer effect
+    public func shimmer(isAnimating: Bool = true) -> some View {
+        self.overlay(
+            FCShimmer(isAnimating: isAnimating)
+                .mask(self),
+            alignment: .leading
+        )
     }
 }

@@ -11,6 +11,15 @@ public struct OnboardingView: View {
     @EnvironmentObject private var coordinator: AppCoordinator
     @State private var currentPage = 0
     
+    // TODO for Opus: This needs a complete rewrite with:
+    // - Full-screen hero pages (use FCHeroSection)
+    // - Parallax scrolling effect
+    // - Bold typography: "Fight Back." / "Scan." / "Win."
+    // - Smooth page transitions with spring physics
+    // - 5 pages: Welcome → Scan → Intelligence → Appeal → Get Started
+    // - Use FCButton for navigation buttons
+    // - Add FCHaptics.pageChange() on page change
+    
     private let pages: [OnboardingPage] = [
         OnboardingPage(
             imageName: "onboarding_scan",

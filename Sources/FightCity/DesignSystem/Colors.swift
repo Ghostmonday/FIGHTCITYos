@@ -60,6 +60,81 @@ public enum AppColors {
     public static let confidenceHigh = Color("ConfidenceHigh", bundle: nil)
     public static let confidenceMedium = Color("ConfidenceMedium", bundle: nil)
     public static let confidenceLow = Color("ConfidenceLow", bundle: nil)
+    
+    // MARK: - AI Feature Colors
+    
+    /// Apple Intelligence brand color (purple/indigo)
+    public static let intelligence = Color(red: 0.4, green: 0.2, blue: 0.9)
+    
+    /// Scan/capture green
+    public static let scanGreen = Color(red: 0.2, green: 0.8, blue: 0.4)
+    
+    /// Document/vision blue
+    public static let visionBlue = Color(red: 0.1, green: 0.5, blue: 0.9)
+    
+    /// Premium gold accent
+    public static let premiumGold = Color(red: 0.83, green: 0.68, blue: 0.21)
+}
+
+// MARK: - Gradient Definitions
+
+public extension AppColors {
+    /// Primary gradient for hero sections
+    static let primaryGradient = LinearGradient(
+        colors: [primary, primary.opacity(0.8)],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+    
+    /// Intelligence gradient for AI features
+    static let intelligenceGradient = LinearGradient(
+        colors: [intelligence, intelligence.opacity(0.7)],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+    
+    /// Success gradient
+    static let successGradient = LinearGradient(
+        colors: [success, success.opacity(0.7)],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+    
+    /// Warning gradient
+    static let warningGradient = LinearGradient(
+        colors: [warning, warning.opacity(0.7)],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+    
+    /// Error gradient
+    static let errorGradient = LinearGradient(
+        colors: [error, error.opacity(0.7)],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+    
+    /// Premium gold gradient
+    static let premiumGradient = LinearGradient(
+        colors: [premiumGold, Color(red: 0.9, green: 0.8, blue: 0.3)],
+        startPoint: .topLeading,
+        endPoint: .bottomTrailing
+    )
+}
+
+// MARK: - Glassmorphism
+
+public extension AppColors {
+    /// Translucent white for glass effect
+    static let glassWhite = Color.white.opacity(0.2)
+    
+    /// Translucent black for glass effect
+    static let glassBlack = Color.black.opacity(0.3)
+    
+    /// Background blur material
+    static let materialUltraThin = Color(uiColor: .systemBackground).opacity(0.4)
+    static let materialThin = Color(uiColor: .systemBackground).opacity(0.6)
+    static let materialMedium = Color(uiColor: .systemBackground).opacity(0.8)
 }
 
 // MARK: - Semantic Color Extensions

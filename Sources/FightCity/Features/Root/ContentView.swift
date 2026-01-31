@@ -72,7 +72,7 @@ public struct ContentView: View {
             // ConfirmationView requires init(result:onConfirm:onEdit:onRetake:)
             //
             // Fix:
-            ConfirmationView(
+ConfirmationView(
                 captureResult: result,
                 onConfirm: { result in
                     // Save to history
