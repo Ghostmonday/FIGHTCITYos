@@ -257,6 +257,7 @@ public actor CameraManager: NSObject {
             return true
         } else {
             // Fallback to traditional camera capture
+            // TODO: Replace with Logger.shared.info("Document scanner not available, falling back to traditional camera")
             print("Document scanner not available, falling back to traditional camera")
             
             // Stop current session if running

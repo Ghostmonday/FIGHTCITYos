@@ -16,6 +16,16 @@ public final class AppConfig: ObservableObject {
     // MARK: - API Configuration
     
     /// Base URL for the API - configurable for different environments
+    // TODO: PHASE 5 - Update production API URL after backend deployment
+    // Current DEBUG: http://localhost:8000
+    // Current RELEASE: https://api.fightcitytickets.com (not yet deployed)
+    // 
+    // Backend deployment checklist (PHASE 5):
+    // 1. Deploy FastAPI backend to Railway/Render/Fly.io
+    // 2. Set up PostgreSQL database
+    // 3. Configure HTTPS with valid certificate
+    // 4. Update this URL to actual deployed endpoint
+    // 5. Test all APIEndpoints from iOS app
     @Published public var apiBaseURL: URL
     
     /// API timeout interval in seconds

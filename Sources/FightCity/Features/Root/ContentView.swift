@@ -67,6 +67,24 @@ public struct ContentView: View {
             CaptureView()
             
         case .confirmation(let result):
+            // TODO: PHASE 1, TASK 1.5 - Fix ConfirmationView initialization
+            // Current issue: ConfirmationView(result:) doesn't match actual init signature
+            // ConfirmationView requires init(result:onConfirm:onEdit:onRetake:)
+            //
+            // Fix:
+            // ConfirmationView(
+            //     result: capturedResult,
+            //     onConfirm: { result in
+            //         // Save to history
+            //         // Navigate to next step
+            //     },
+            //     onEdit: { result in
+            //         // Show edit sheet
+            //     },
+            //     onRetake: {
+            //         // Clear result and return to capture
+            //     }
+            // )
             ConfirmationView(result: result)
             
         case .history:
@@ -339,6 +357,16 @@ struct SettingsView: View {
 }
 
 // MARK: - Previews
+
+// TODO: PHASE 3 - Create Appeal Flow Files (currently missing)
+// Required files:
+// - Sources/FightCity/Features/Appeal/AppealEntryView.swift
+// - Sources/FightCity/Features/Appeal/AppealViewModel.swift
+// - Sources/FightCity/Features/Appeal/EvidencePickerView.swift
+// - Sources/FightCityFoundation/Models/Appeal.swift
+// - Sources/FightCityFoundation/Networking/AppealAPI.swift
+//
+// Appeal flow: Confirmation → AppealEntry → Submit → Status tracking in History
 
 #if DEBUG
 struct ContentView_Previews: PreviewProvider {

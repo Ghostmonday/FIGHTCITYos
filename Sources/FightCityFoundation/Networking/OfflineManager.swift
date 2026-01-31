@@ -311,6 +311,7 @@ public struct FilePersistence<T: Codable> {
             let data = try encoder.encode(items)
             try data.write(to: fileURL)
         } catch {
+            // TODO: Replace with Logger.shared.error("Persistence save error", error: error)
             print("Persistence save error: \(error)")
         }
     }
@@ -321,6 +322,7 @@ public struct FilePersistence<T: Codable> {
             let data = try Data(contentsOf: fileURL)
             return try decoder.decode([T].self, from: data)
         } catch {
+            // TODO: Replace with Logger.shared.error("Persistence load error", error: error)
             print("Persistence load error: \(error)")
             return nil
         }

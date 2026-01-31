@@ -50,6 +50,7 @@ public final class TelemetryUploader {
         do {
             try BGTaskScheduler.shared.submit(request)
         } catch {
+            // TODO: Replace with Logger.shared.error("Failed to schedule background upload", error: error)
             print("Failed to schedule background upload: \(error)")
         }
     }

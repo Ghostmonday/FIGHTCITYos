@@ -15,6 +15,18 @@ import FightCityFoundation
 /// APPLE INTELLIGENCE: Route OCR text through Core ML classifier prior to regex
 /// APPLE INTELLIGENCE: Enable dictation UI for appeal writing
 
+// APPLE INTELLIGENCE TODO: This ViewModel needs Apple Intelligence integration
+// Current state: Uses Vision OCR + preprocessing
+// Target state: VisionKit Document Scanner → Live Text → Core ML classifier → Regex fallback
+//
+// PHASE 1 Tasks:
+// - Task 1.2: Integrate VisionKit Document Scanner as primary capture method
+// - Task 1.3: Use Live Text (VisionKit.ImageAnalyzer) for OCR instead of Vision framework
+// - Task 1.4: Add Core ML citation classifier (train with CreateML)
+//
+// Current flow: capturePhoto() → processImage() → OCREngine.recognize() → OCRParsingEngine.parse()
+// Target flow: captureWithDocumentScanner() → LiveText.analyze() → MLClassifier.predict() → fallback to regex
+
 @MainActor
 public final class CaptureViewModel: ObservableObject, DocumentScanCoordinatorDelegate {
     // MARK: - Published State
@@ -118,8 +130,10 @@ public final class CaptureViewModel: ObservableObject, DocumentScanCoordinatorDe
         )
         
         if usedDocumentScanner {
+            // TODO: Replace with Logger.shared.info("Using VisionKit Document Scanner")
             print("Using VisionKit Document Scanner")
         } else {
+            // TODO: Replace with Logger.shared.info("Using traditional camera as fallback")
             print("Using traditional camera as fallback")
         }
     }
@@ -218,6 +232,50 @@ public final class CaptureViewModel: ObservableObject, DocumentScanCoordinatorDe
         let qualityResult = frameAnalyzer.analyze(image)
         qualityWarning = qualityResult.warnings.isEmpty ? nil : qualityResult.feedbackMessage
         
+<<<<<<< HEAD
+=======
+        // Preprocess for OCR
+        let processedImage: UIImage
+        do {
+            processedImage = try await preprocessor.preprocess(image)
+        } catch {
+            // Log preprocessing error but continue with original image
+            // TODO: Replace with Logger.shared.warning("Image preprocessing failed", error: error)
+            print("Warning: Image preprocessing failed: \(error.localizedDescription)")
+            processedImage = image
+        }
+        
+        // Perform OCR
+        let ocrResult: OCREngine.RecognitionResult
+        do {
+            ocrResult = try await ocrEngine.recognizeText(in: processedImage)
+        } catch {
+            return CaptureResult(
+                originalImageData: data,
+                croppedImageData: processedImage.pngData(),
+                rawText: "",
+                confidence: 0,
+                processingTimeMs: Int(Date().timeIntervalSince(startTime) * 1000)
+            )
+        }
+        
+        // Parse citation number
+        let parsingResult = parsingEngine.parse(ocrResult.text)
+        
+        // Calculate confidence
+        let scoreResult = confidenceScorer.score(
+            rawText: ocrResult.text,
+            observations: ocrResult.observations,
+            matchedPattern: parsingResult.matchedPattern
+        )
+        
+        // Validate with API if we have a citation number
+        var citation: Citation?
+        if let citationNumber = parsingResult.citationNumber {
+            citation = await validateCitation(citationNumber, cityId: parsingResult.cityId)
+        }
+        
+>>>>>>> 2127e328cc2a8ff67d681c13729a955c6e9e36aa
         let processingTimeMs = Int(Date().timeIntervalSince(startTime) * 1000)
         
         // Return basic capture result without OCR processing
@@ -308,6 +366,7 @@ public final class CaptureViewModel: ObservableObject, DocumentScanCoordinatorDe
     
     public func documentScanCoordinator(_ coordinator: DocumentScanCoordinator, didFailWith error: DocumentScanError) {
         // Log the error and provide user feedback
+        // TODO: Replace with Logger.shared.error("Document scan failed", error: error)
         print("Document scan failed: \(error.localizedDescription)")
         
         // Provide specific error messages based on error type
