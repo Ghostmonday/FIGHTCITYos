@@ -14,7 +14,7 @@ import FightCityFoundation
 /// APPLE INTELLIGENCE: Integrate with DocumentScanCoordinator for intelligent capture
 
 /// Manages camera capture with full control over exposure, focus, torch, and stabilization
-actor CameraManager: NSObject {
+public actor CameraManager: NSObject {
     // MARK: - Published State
     
     private(set) var isAuthorized = false
@@ -44,14 +44,14 @@ actor CameraManager: NSObject {
     
     private let config: iOSAppConfig
     
-    init(config: iOSAppConfig = .shared) {
+    public init(config: iOSAppConfig = .shared) {
         self.config = config
         super.init()
     }
     
     // MARK: - Authorization
     
-    func requestAuthorization() async -> Bool {
+    public func requestAuthorization() async -> Bool {
         let status = AVCaptureDevice.authorizationStatus(for: .video)
         
         switch status {
@@ -70,7 +70,7 @@ actor CameraManager: NSObject {
     
     // MARK: - Session Setup
     
-    func setupSession() throws {
+    public func setupSession() async throws {
         guard isAuthorized else {
             throw CameraError.notAuthorized
         }
@@ -104,14 +104,12 @@ actor CameraManager: NSObject {
         }
         
         // Configure for high quality
-        if let connection = photoOutput?.connection(with: .video) {
-            connection.videoStabilizationEnabled = true
-        }
+        // Note: Video stabilization is configured via AVCapturePhotoSettings, not connection
         
         captureSession.commitConfiguration()
     }
     
-    func startSession() {
+    public func startSession() async {
         guard !captureSession.isRunning else { return }
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             self?.captureSession.startRunning()
@@ -121,7 +119,7 @@ actor CameraManager: NSObject {
         }
     }
     
-    func stopSession() {
+    public func stopSession() async {
         guard captureSession.isRunning else { return }
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             self?.captureSession.stopRunning()
@@ -153,7 +151,7 @@ actor CameraManager: NSObject {
         // Add new input
         guard let newDevice = currentDevice,
               let newInput = try? AVCaptureDeviceInput(device: newDevice) else {
-            captureSession.cancelConfiguration()
+            captureSession.commitConfiguration()
             throw CameraError.deviceUnavailable
         }
         
@@ -226,7 +224,7 @@ actor CameraManager: NSObject {
     
     // MARK: - Capture
     
-    func capturePhoto() async throws -> Data? {
+    public func capturePhoto() async throws -> Data? {
         guard let photoOutput = photoOutput else {
             throw CameraError.outputUnavailable
         }
@@ -251,7 +249,7 @@ actor CameraManager: NSObject {
     /// - Returns: True if document scanner was used, false if fallback to traditional camera
     /// - Note: Requires iOS 16.0+
     @available(iOS 16.0, *)
-    func captureWithDocumentScanner(from viewController: UIViewController, coordinator: DocumentScanCoordinator) async -> Bool {
+    public func captureWithDocumentScanner(from viewController: UIViewController, coordinator: DocumentScanCoordinator) async -> Bool {
         // Check if we should use document scanner
         if DocumentScanCoordinator.shouldUseDocumentScanner() {
             // Use VisionKit Document Scanner
@@ -263,13 +261,13 @@ actor CameraManager: NSObject {
             
             // Stop current session if running
             if isSessionRunning {
-                stopSession()
+                await stopSession()
             }
             
             do {
                 // Setup and start session for fallback capture
-                try setupSession()
-                startSession()
+                try await setupSession()
+                await startSession()
                 
                 // Wait a moment for camera to stabilize
                 try await Task.sleep(nanoseconds: 500_000_000) // 0.5 seconds
@@ -280,7 +278,7 @@ actor CameraManager: NSObject {
                 }
                 
                 // Stop session after capture
-                stopSession()
+                await stopSession()
                 
                 // Create a mock scan result to match the document scanner interface
                 let mockImage = UIImage(data: imageData)!
@@ -299,7 +297,7 @@ actor CameraManager: NSObject {
                 
             } catch {
                 // Stop session on error
-                stopSession()
+                await stopSession()
                 
                 // Notify delegate with error
                 if let cameraError = error as? CameraError {
@@ -317,7 +315,7 @@ actor CameraManager: NSObject {
     /// Check if document scanner is recommended for current device/configuration
     /// - Note: Requires iOS 16.0+
     @available(iOS 16.0, *)
-    static func isDocumentScannerRecommended() -> Bool {
+    public static func isDocumentScannerRecommended() -> Bool {
         return DocumentScanCoordinator.shouldUseDocumentScanner()
     }
     
@@ -328,7 +326,9 @@ actor CameraManager: NSObject {
             throw CameraError.invalidImage
         }
         
-        let ciImage = CIImage(image: image)
+        guard let ciImage = CIImage(image: image) else {
+            throw CameraError.invalidImage
+        }
         return (image, ciImage)
     }
     
@@ -342,7 +342,7 @@ actor CameraManager: NSObject {
 // MARK: - AVCaptureVideoDataOutputSampleBufferDelegate
 
 extension CameraManager: AVCaptureVideoDataOutputSampleBufferDelegate {
-    nonisolated func captureOutput(
+    public nonisolated func captureOutput(
         _ output: AVCaptureOutput,
         didOutput sampleBuffer: CMSampleBuffer,
         from connection: AVCaptureConnection

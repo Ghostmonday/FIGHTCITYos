@@ -125,6 +125,7 @@ public extension AppTypography {
 
 public extension Text {
     func appLineHeight(_ lineHeight: CGFloat) -> some View {
-        self.font(.body).lineSpacing(lineHeight - AppTypography.bodyLarge.lineHeight)
+        // Use default body font line spacing
+        self.font(.body).lineSpacing(lineHeight - 20) // Approximate body font line height
     }
 }

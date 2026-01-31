@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FightCityiOS
 import FightCityFoundation
 import FightCityiOS
 
@@ -146,10 +147,10 @@ public struct ConfirmationView: View {
         }
     }
     
-    private func confidenceLevel(for confidence: Double) -> ConfidenceScorer.ConfidenceLevel {
-        if confidence >= 0.85 { return .high }
-        if confidence >= 0.60 { return .medium }
-        return .low
+    private func confidenceLevel(for confidence: Double) -> String {
+        if confidence >= 0.85 { return "high" }
+        if confidence >= 0.60 { return "medium" }
+        return "low"
     }
     
     private func confidenceMessage(for confidence: Double) -> String {

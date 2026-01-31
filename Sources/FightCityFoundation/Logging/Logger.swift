@@ -32,6 +32,13 @@ public protocol LoggerProtocol {
     func warning(_ message: String, file: String, function: String, line: Int)
     func error(_ message: String, file: String, function: String, line: Int)
     func error(_ error: Error, file: String, function: String, line: Int)
+    
+    // Default implementations for convenience
+    func debug(_ message: String)
+    func info(_ message: String)
+    func warning(_ message: String)
+    func error(_ message: String)
+    func error(_ error: Error)
 }
 
 /// Production logger using OSLog
@@ -105,5 +112,29 @@ public final class MockLogger: LoggerProtocol {
     
     public func clear() {
         logs.removeAll()
+    }
+}
+
+// MARK: - Protocol Default Implementations
+
+extension LoggerProtocol {
+    public func debug(_ message: String) {
+        debug(message, file: #file, function: #function, line: #line)
+    }
+    
+    public func info(_ message: String) {
+        info(message, file: #file, function: #function, line: #line)
+    }
+    
+    public func warning(_ message: String) {
+        warning(message, file: #file, function: #function, line: #line)
+    }
+    
+    public func error(_ message: String) {
+        error(message, file: #file, function: #function, line: #line)
+    }
+    
+    public func error(_ error: Error) {
+        self.error(error, file: #file, function: #function, line: #line)
     }
 }

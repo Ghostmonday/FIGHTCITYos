@@ -102,7 +102,7 @@ public struct BoundingBoxOverlayData: Identifiable {
 final class BoundingBoxOverlayView: UIView {
     var boxes: [BoundingBoxOverlayData] = [] {
         didSet {
-            setNeedsDraw()
+            setNeedsDisplay()
         }
     }
     

@@ -15,13 +15,15 @@ public protocol NetworkConnectivityChecker {
 /// Default connectivity checker (always assumes connected - can be overridden)
 public struct DefaultConnectivityChecker: NetworkConnectivityChecker {
     public var isConnected: Bool { true }
+    
+    public init() {}
 }
 
 /// Manages offline operations with persistent queue and exponential backoff
 public final class OfflineManager {
     public static let shared = OfflineManager()
     
-    private let queue: PersistentQueue<OfflineOperation>
+    private var queue: PersistentQueue<OfflineOperation>
     private var connectivityChecker: NetworkConnectivityChecker
     private var retryTimer: Timer?
     
@@ -189,7 +191,7 @@ public final class OfflineManager {
 // MARK: - Persistent Queue
 
 /// Thread-safe persistent queue for offline operations
-public struct PersistentQueue<T: Codable & Identifiable> {
+public final class PersistentQueue<T: Codable & Identifiable> where T.ID == UUID {
     private var items: [T] = []
     private let queue = DispatchQueue(label: "com.fightcitytickets.offlinequeue", attributes: .concurrent)
     private let persistence: FilePersistence<T>
@@ -201,8 +203,9 @@ public struct PersistentQueue<T: Codable & Identifiable> {
         self.items = persistence.load() ?? []
     }
     
-    public mutating func enqueue(_ item: T) {
-        queue.async(flags: .barrier) {
+    public func enqueue(_ item: T) {
+        queue.async(flags: .barrier) { [weak self] in
+            guard let self = self else { return }
             if self.items.count >= self.maxSize {
                 self.items.removeFirst()
             }
@@ -211,7 +214,7 @@ public struct PersistentQueue<T: Codable & Identifiable> {
         }
     }
     
-    public mutating func dequeue() -> T? {
+    public func dequeue() -> T? {
         queue.sync {
             guard !items.isEmpty else { return nil }
             let item = items.removeFirst()
@@ -220,15 +223,17 @@ public struct PersistentQueue<T: Codable & Identifiable> {
         }
     }
     
-    public mutating func remove(id: UUID) {
-        queue.async(flags: .barrier) {
+    public func remove(id: UUID) {
+        queue.async(flags: .barrier) { [weak self] in
+            guard let self = self else { return }
             self.items.removeAll { $0.id == id }
             self.persistence.save(self.items)
         }
     }
     
-    public mutating func update(_ item: T) {
-        queue.async(flags: .barrier) {
+    public func update(_ item: T) {
+        queue.async(flags: .barrier) { [weak self] in
+            guard let self = self else { return }
             if let index = self.items.firstIndex(where: { $0.id == item.id }) {
                 self.items[index] = item
                 self.persistence.save(self.items)
@@ -236,8 +241,9 @@ public struct PersistentQueue<T: Codable & Identifiable> {
         }
     }
     
-    public mutating func clear() {
-        queue.async(flags: .barrier) {
+    public func clear() {
+        queue.async(flags: .barrier) { [weak self] in
+            guard let self = self else { return }
             self.items.removeAll()
             self.persistence.save(self.items)
         }

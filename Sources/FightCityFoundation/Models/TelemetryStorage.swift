@@ -97,7 +97,7 @@ public final class TelemetryStorage {
 // MARK: - Uploaded Record
 
 public struct UploadedRecord: Codable {
-    public let id: UUID
+    public let id: String
     public let timestamp: Date
 }
 

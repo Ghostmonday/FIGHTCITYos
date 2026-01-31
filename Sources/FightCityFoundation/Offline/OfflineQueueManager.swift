@@ -92,11 +92,16 @@ public actor OfflineQueueManager {
     private let apiClient: APIClientProtocol
     private let logger: LoggerProtocol
     
-    public init(storage: Storage = UserDefaultsStorage(), apiClient: APIClientProtocol = APIClient.shared, logger: LoggerProtocol = Logger.shared) {
+    public init(storage: Storage = UserDefaultsStorage(), apiClient: APIClientProtocol? = nil, logger: LoggerProtocol = Logger.shared) {
         self.storage = storage
-        self.apiClient = apiClient
+        self.apiClient = apiClient ?? APIClient.shared
         self.logger = logger
-        loadQueue()
+        // Load queue synchronously during initialization
+        if let data = storage.load(key: storageKey),
+           let decoded = try? JSONDecoder().decode([QueueItem].self, from: data) {
+            self.queue = decoded
+            logger.info("Loaded \(queue.count) items from offline queue")
+        }
     }
     
     // MARK: - Public Methods
@@ -106,6 +111,7 @@ public actor OfflineQueueManager {
         guard queue.count < maxQueueSize else {
             logger.warning("Offline queue is full, dropping oldest item")
             queue.removeFirst()
+            return
         }
         
         let item = QueueItem(operation: operation)
@@ -129,9 +135,9 @@ public actor OfflineQueueManager {
     }
     
     /// Clear all items
-    public func clear() {
+    public func clear() async {
         queue.removeAll()
-        persistQueue()
+        await persistQueue()
     }
     
     // MARK: - Private Methods
@@ -162,10 +168,10 @@ public actor OfflineQueueManager {
         switch item.operation {
         case .validateCitation(let request):
             _ = try await apiClient.validateCitation(request)
-        case .submitAppeal(let request):
+        case .submitAppeal(_):
             // Would call submit appeal endpoint
             break
-        case .uploadTelemetry(let records):
+        case .uploadTelemetry(_):
             // Would upload telemetry
             break
         }

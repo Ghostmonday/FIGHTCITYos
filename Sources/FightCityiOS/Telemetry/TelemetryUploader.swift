@@ -7,6 +7,7 @@
 
 import Foundation
 import BackgroundTasks
+import FightCityFoundation
 
 /// Uploads telemetry data to backend with retry logic
 public final class TelemetryUploader {
@@ -25,8 +26,9 @@ public final class TelemetryUploader {
         let request = TelemetryUploadRequest(records: records)
         
         do {
+            let endpoint = APIEndpoint(path: APIEndpoints.telemetryUpload)
             let _: String = try await APIClient.shared.post(
-                .telemetryUpload(request),
+                endpoint,
                 body: request
             )
         } catch {
@@ -64,7 +66,7 @@ public final class TelemetryBackgroundHandler {
     /// Handle background task
     public func handleBackgroundTask(_ task: BGProcessingTask) {
         // Schedule next upload
-        TelemetryUploader.shared.scheduleBackgroundUpload()
+        TelemetryUploader().scheduleBackgroundUpload()
         
         // Upload pending records
         Task {

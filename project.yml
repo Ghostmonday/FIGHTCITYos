@@ -2,7 +2,7 @@ name: FightCityTickets
 options:
   bundleIdPrefix: com.fightcitytickets
   deploymentTarget:
-    iOS: "16.0"
+    iOS: "17.0"
   xcodeVersion: "15.0"
   generateEmptyDirectories: true
   groupSortPosition: top
@@ -26,6 +26,7 @@ settings:
     TARGETED_DEVICE_FAMILY: "1,2"
     SUPPORTS_MACCATALYST: NO
     SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD: YES
+    ALWAYS_SEARCH_USER_PATHS: NO
 
 configs:
   Debug:
@@ -43,7 +44,7 @@ targets:
   FightCityFoundation:
     type: framework
     platform: iOS
-    deploymentTarget: "16.0"
+    deploymentTarget: "17.0"
     sources:
       - path: Sources/FightCityFoundation
         excludes:
@@ -57,6 +58,7 @@ targets:
         ENABLE_TESTABILITY: YES
         CODE_SIGN_STYLE: Automatic
         APPLICATION_EXTENSION_API_ONLY: YES
+        ALWAYS_SEARCH_USER_PATHS: NO
     frameworks:
       - Foundation
       - Security
@@ -77,7 +79,7 @@ targets:
   FightCityiOS:
     type: framework
     platform: iOS
-    deploymentTarget: "16.0"
+    deploymentTarget: "17.0"
     sources:
       - path: Sources/FightCityiOS
         excludes:
@@ -93,6 +95,7 @@ targets:
         ENABLE_TESTABILITY: YES
         CODE_SIGN_STYLE: Automatic
         APPLICATION_EXTENSION_API_ONLY: YES
+        ALWAYS_SEARCH_USER_PATHS: NO
     frameworks:
       - Foundation
       - UIKit
@@ -101,6 +104,10 @@ targets:
       - CoreImage
       - VisionKit
       - Security
+      - Speech
+      - NaturalLanguage
+      - MapKit
+      - CoreML
     info:
       path: Support/FightCityiOS-Info.plist
       properties:
@@ -118,7 +125,7 @@ targets:
   FightCity:
     type: application
     platform: iOS
-    deploymentTarget: "16.0"
+    deploymentTarget: "17.0"
     sources:
       - path: Sources/FightCity
         excludes:
@@ -143,10 +150,11 @@ targets:
         ENABLE_TESTABILITY: YES
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_TEAM: ""
-        IPHONEOS_DEPLOYMENT_TARGET: "16.0"
+        IPHONEOS_DEPLOYMENT_TARGET: "17.0"
         TARGETED_DEVICE_FAMILY: "1,2"
         SUPPORTS_MACCATALYST: NO
         LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks"
+        ALWAYS_SEARCH_USER_PATHS: NO
     frameworks:
       - Foundation
       - SwiftUI
@@ -156,7 +164,12 @@ targets:
       - CoreImage
       - VisionKit
       - Security
+      - Speech
+      - NaturalLanguage
+      - MapKit
+      - CoreML
       - BackgroundTasks
+      - AppIntents
     capabilities:
       - Background Modes:
           - Background processing
@@ -220,6 +233,7 @@ targets:
         CODE_SIGN_STYLE: Automatic
         TEST_HOST: ""
         BUNDLE_LOADER: ""
+        ALWAYS_SEARCH_USER_PATHS: NO
     frameworks:
       - Foundation
       - XCTest
@@ -240,6 +254,7 @@ targets:
         CODE_SIGN_STYLE: Automatic
         TEST_HOST: ""
         BUNDLE_LOADER: ""
+        ALWAYS_SEARCH_USER_PATHS: NO
     frameworks:
       - Foundation
       - UIKit
@@ -267,6 +282,7 @@ targets:
         CODE_SIGN_STYLE: Automatic
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/FightCity.app/FightCity"
         BUNDLE_LOADER: "$(TEST_HOST)"
+        ALWAYS_SEARCH_USER_PATHS: NO
     frameworks:
       - Foundation
       - SwiftUI
@@ -287,6 +303,7 @@ targets:
         SWIFT_VERSION: "5.9"
         CODE_SIGN_STYLE: Automatic
         TEST_TARGET_NAME: FightCity
+        ALWAYS_SEARCH_USER_PATHS: NO
     frameworks:
       - Foundation
       - XCTest

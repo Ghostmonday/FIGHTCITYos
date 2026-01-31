@@ -111,18 +111,18 @@ public struct AppealSubmitRequest: Codable {
 // MARK: - API Error
 
 /// API error response
-public struct APIError: Codable, Error {
+public struct APIErrorResponse: Codable, Error {
     public let error: String
     public let message: String?
     public let code: String?
     
-    public static let networkError = APIError(
+    public static let networkError = APIErrorResponse(
         error: "Network Error",
         message: "Unable to connect to the server. Please check your internet connection.",
         code: "NETWORK_ERROR"
     )
     
-    public static let decodingError = APIError(
+    public static let decodingError = APIErrorResponse(
         error: "Data Error",
         message: "Unable to process server response.",
         code: "DECODING_ERROR"

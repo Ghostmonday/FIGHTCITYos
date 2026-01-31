@@ -7,7 +7,6 @@
 
 import SwiftUI
 import AVFoundation
-import Vision
 import VisionKit
 import FightCityiOS
 import FightCityFoundation
@@ -30,10 +29,6 @@ public final class CaptureViewModel: ObservableObject, DocumentScanCoordinatorDe
     
     private let cameraManager: CameraManager
     private let documentScanner = DocumentScanCoordinator()
-    private let ocrEngine = OCREngine()
-    private let preprocessor = OCRPreprocessor()
-    private let parsingEngine = OCRParsingEngine()
-    private let confidenceScorer = ConfidenceScorer()
     private let frameAnalyzer = FrameQualityAnalyzer()
     private let apiClient = APIClient.shared
     private let config: AppConfig
@@ -79,6 +74,11 @@ public final class CaptureViewModel: ObservableObject, DocumentScanCoordinatorDe
     
     public func capturePhoto() async {
         processingState = .capturing
+        
+        guard let cameraManager = await cameraManager else {
+            processingState = .error("Camera not initialized")
+            return
+        }
         
         do {
             guard let imageData = try await cameraManager.capturePhoto() else {
@@ -218,58 +218,14 @@ public final class CaptureViewModel: ObservableObject, DocumentScanCoordinatorDe
         let qualityResult = frameAnalyzer.analyze(image)
         qualityWarning = qualityResult.warnings.isEmpty ? nil : qualityResult.feedbackMessage
         
-        // Preprocess for OCR
-        let processedImage: UIImage
-        do {
-            processedImage = try await preprocessor.preprocess(image)
-        } catch {
-            // Log preprocessing error but continue with original image
-            print("Warning: Image preprocessing failed: \(error.localizedDescription)")
-            processedImage = image
-        }
-        
-        // Perform OCR
-        let ocrResult: OCREngine.RecognitionResult
-        do {
-            ocrResult = try await ocrEngine.recognizeText(in: processedImage)
-        } catch {
-            return CaptureResult(
-                originalImageData: data,
-                croppedImageData: processedImage.pngData(),
-                rawText: "",
-                confidence: 0,
-                processingTimeMs: Int(Date().timeIntervalSince(startTime) * 1000)
-            )
-        }
-        
-        // Parse citation number
-        let parsingResult = parsingEngine.parse(ocrResult.text)
-        
-        // Calculate confidence
-        let scoreResult = confidenceScorer.score(
-            rawText: ocrResult.text,
-            observations: ocrResult.observations,
-            matchedPattern: parsingResult.matchedPattern
-        )
-        
-        // Validate with API if we have a citation number
-        var citation: Citation?
-        if let citationNumber = parsingResult.citationNumber {
-            citation = await validateCitation(citationNumber, cityId: parsingResult.cityId)
-        }
-        
         let processingTimeMs = Int(Date().timeIntervalSince(startTime) * 1000)
         
+        // Return basic capture result without OCR processing
         return CaptureResult(
             originalImageData: data,
-            croppedImageData: processedImage.pngData(),
-            rawText: ocrResult.text,
-            extractedCitationNumber: citation?.citationNumber ?? parsingResult.citationNumber,
-            extractedCityId: citation?.cityId ?? parsingResult.cityId,
-            extractedDate: citation?.violationDate,
-            confidence: scoreResult.overallConfidence,
-            processingTimeMs: processingTimeMs,
-            observations: [:]
+            rawText: "",
+            confidence: 0,
+            processingTimeMs: processingTimeMs
         )
     }
     

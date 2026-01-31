@@ -24,74 +24,6 @@ public protocol CameraManagerProtocol {
     func toggleTorch() async
 }
 
-// MARK: - OCR Protocol
-
-/// Protocol for OCR operations - enables mock testing
-public protocol OCREngineProtocol {
-    func recognizeText(in image: Data, configuration: OCRConfiguration) async throws -> OCRRecognitionResult
-    func recognizeWithHighAccuracy(in image: Data) async throws -> OCRRecognitionResult
-    func recognizeFast(in image: Data) async throws -> OCRRecognitionResult
-}
-
-/// OCR configuration
-public struct OCRConfiguration {
-    public var recognitionLevel: RecognitionLevel
-    public var usesLanguageCorrection: Bool
-    public var recognitionLanguages: [String]
-    public var autoDetectLanguage: Bool
-    
-    public init(
-        recognitionLevel: RecognitionLevel = .accurate,
-        usesLanguageCorrection: Bool = true,
-        recognitionLanguages: [String] = ["en-US"],
-        autoDetectLanguage: Bool = false
-    ) {
-        self.recognitionLevel = recognitionLevel
-        self.usesLanguageCorrection = usesLanguageCorrection
-        self.recognitionLanguages = recognitionLanguages
-        self.autoDetectLanguage = autoDetectLanguage
-    }
-}
-
-public enum RecognitionLevel: String {
-    case fast = "fast"
-    case accurate = "accurate"
-}
-
-/// OCR result from engine
-public struct OCRRecognitionResult {
-    public let text: String
-    public let confidence: Double
-    public let processingTime: TimeInterval
-    public let observations: [OCRObservation]
-    
-    public init(text: String, confidence: Double, processingTime: TimeInterval, observations: [OCRObservation]) {
-        self.text = text
-        self.confidence = confidence
-        self.processingTime = processingTime
-        self.observations = observations
-    }
-}
-
-public struct OCRObservation {
-    public let text: String
-    public let confidence: Double
-    public let boundingBox: CGRect
-    
-    public init(text: String, confidence: Double, boundingBox: CGRect) {
-        self.text = text
-        self.confidence = confidence
-        self.boundingBox = boundingBox
-    }
-}
-
-// MARK: - Image Preprocessing Protocol
-
-/// Protocol for image preprocessing
-public protocol ImagePreprocessorProtocol {
-    func preprocess(_ imageData: Data) async throws -> Data
-}
-
 // MARK: - API Client Protocol
 
 /// Protocol for API client - enables mock testing
@@ -102,12 +34,7 @@ public protocol APIClientProtocol {
     func validateCitation(_ request: CitationValidationRequest) async throws -> CitationValidationResponse
 }
 
-// MARK: - Confidence Scoring Protocol
-
-/// Protocol for confidence scoring
-public protocol ConfidenceScorerProtocol {
-    func score(rawText: String, observations: [OCRObservation], matchedPattern: CityPattern?) -> ConfidenceResult
-}
+// MARK: - Confidence Result Types
 
 /// Confidence result
 public struct ConfidenceResult {

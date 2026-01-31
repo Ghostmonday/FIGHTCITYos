@@ -95,3 +95,42 @@
 "Accessibility.TorchButton" = "Toggle flash";
 "Accessibility.GalleryButton" = "Open photo library";
 "Accessibility.ManualEntry" = "Enter citation number manually";
+
+// MARK: - Apple Intelligence
+
+"AI.AppealWriter.Title" = "AI Appeal Assistant";
+"AI.AppealWriter.Generate" = "Generate Appeal";
+"AI.AppealWriter.Tone" = "Tone";
+"AI.AppealWriter.Tone.Formal" = "Formal";
+"AI.AppealWriter.Tone.Respectful" = "Respectful";
+"AI.AppealWriter.Tone.Persuasive" = "Persuasive";
+"AI.AppealWriter.Tone.Factual" = "Factual";
+"AI.AppealWriter.Improve" = "Improve Writing";
+"AI.AppealWriter.Suggestions" = "Suggestions";
+"AI.AppealWriter.Sentiment" = "Sentiment Analysis";
+"AI.AppealWriter.Confidence" = "AI Confidence";
+"AI.Dictation.Start" = "Start Dictation";
+"AI.Dictation.Stop" = "Stop Dictation";
+"AI.Dictation.Listening" = "Listening...";
+"AI.Dictation.Processing" = "Processing speech...";
+
+"AI.SceneAnalysis.Title" = "Scene Analysis";
+"AI.SceneAnalysis.Detected" = "Detected";
+"AI.SceneAnalysis.Quality" = "Image Quality";
+"AI.SceneAnalysis.EvidenceSuitable" = "Suitable as Evidence";
+"AI.SceneAnalysis.NotSuitable" = "Not Suitable for Evidence";
+
+"AI.Location.Evidence" = "Location Evidence";
+"AI.Location.Capturing" = "Capturing location...";
+"AI.Location.Snapshot" = "Location Snapshot";
+
+"AI.Classification.Title" = "AI Classification";
+"AI.Classification.Processing" = "Analyzing citation...";
+"AI.Classification.Confidence" = "AI Confidence Score";
+
+// MARK: - Shortcuts
+
+"Shortcuts.ScanTicket" = "Scan Parking Ticket";
+"Shortcuts.ContestTicket" = "Contest Last Ticket";
+"Shortcuts.CheckStatus" = "Check Citation Status";
+"Shortcuts.AddToSiri" = "Add to Siri";

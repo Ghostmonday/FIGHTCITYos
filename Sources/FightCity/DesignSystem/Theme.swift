@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FightCityFoundation
 
 // MARK: - Theme
 
@@ -334,8 +335,8 @@ public struct Theme {
     public let typography: ThemeTypography
     
     public static var current: Theme {
-        // Could be extended to support dynamic theme switching
-        return .light
+        // Return default light theme
+        return AppTheme.light
     }
 }
 
@@ -375,7 +376,10 @@ public extension Text {
     func typography(_ style: TextStyle, theme: Theme = .current, lineHeight: CGFloat? = nil) -> some View {
         let font = theme.typography.font(for: style)
         let height = lineHeight ?? theme.typography.lineHeight(for: style)
-        return self.font(font).lineSpacing(height - font.lineHeight)
+        // Approximate line height for system font (typically 1.2x font size)
+        // Note: Font doesn't expose pointSize directly, use estimated value
+        let approximateLineHeight: CGFloat = 20.0 // Approximate for body font
+        return self.font(font).lineSpacing(height - approximateLineHeight)
     }
     
     /// Apply theme color
@@ -426,13 +430,15 @@ public extension View {
     /// Style for confidence score display
     func confidenceStyle(level: ConfidenceLevelType, theme: Theme = .current) -> some View {
         let color: Color
-        switch level {
-        case .high:
+        switch level.lowercased() {
+        case "high":
             color = theme.colors.confidenceHigh
-        case .medium:
+        case "medium":
             color = theme.colors.confidenceMedium
-        case .low:
+        case "low":
             color = theme.colors.confidenceLow
+        default:
+            color = theme.colors.confidenceMedium
         }
         return self.font(theme.typography.confidenceScore)
             .foregroundColor(color)
@@ -456,5 +462,5 @@ public extension View {
 
 // MARK: - Confidence Level Type Alias
 
-/// Type alias for confidence level from ConfidenceScorer
-public typealias ConfidenceLevelType = FightCityiOS.ConfidenceScorer.ConfidenceLevel
+/// Type alias for confidence level - removed OCR dependency
+public typealias ConfidenceLevelType = String

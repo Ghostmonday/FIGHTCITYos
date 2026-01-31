@@ -28,7 +28,7 @@ public struct DefaultAPIConfiguration: APIConfiguration {
 }
 
 /// API client with retry logic, timeout, and offline support
-public actor APIClient {
+public actor APIClient: APIClientProtocol {
     public static let shared = APIClient()
     
     private let session: URLSession
@@ -62,12 +62,12 @@ public actor APIClient {
     // MARK: - GET
     
     public func get<T: Decodable>(_ endpoint: APIEndpoint) async throws -> T {
-        let request = try buildRequest(endpoint: endpoint, method: .get)
+        let request = try buildRequest(endpoint: endpoint, method: .get, body: Optional<String>.none)
         return try await execute(request)
     }
     
     public func getVoid(_ endpoint: APIEndpoint) async throws {
-        let request = try buildRequest(endpoint: endpoint, method: .get)
+        let request = try buildRequest(endpoint: endpoint, method: .get, body: Optional<Data>.none)
         let (_, response) = try await session.data(for: request)
         try validateResponse(response)
     }
@@ -83,6 +83,12 @@ public actor APIClient {
         let request = try buildRequest(endpoint: endpoint, method: .post, body: body)
         let (_, response) = try await session.data(for: request)
         try validateResponse(response)
+    }
+    
+    // MARK: - API Client Protocol
+    
+    public func validateCitation(_ request: CitationValidationRequest) async throws -> CitationValidationResponse {
+        try await post(APIEndpoint.validateCitation(request), body: request)
     }
     
     // MARK: - Private Methods
@@ -111,7 +117,7 @@ public actor APIClient {
         do {
             return try decoder.decode(T.self, from: data)
         } catch {
-            throw APIError.decodingError(error: error)
+            throw APIError.decodingError(error)
         }
     }
     
@@ -198,37 +204,14 @@ public struct APIEndpoint {
     }
 }
 
-// MARK: - Telemetry Upload (Moved from ValidationResult for proper separation)
+// MARK: - Telemetry Upload (Types defined in Models/TelemetryRecord.swift)
 
 /// Telemetry upload request
 public struct TelemetryUploadRequest: Codable {
     public let records: [TelemetryRecord]
-}
-
-/// Individual telemetry record (opt-in)
-public struct TelemetryRecord: Codable {
-    public let city: String
-    public let timestamp: Date
-    public let deviceModel: String
-    public let iOSVersion: String
-    public let originalImageHash: String
-    public let croppedImageHash: String
-    public let ocrOutput: String
-    public let userCorrection: String?
-    public let confidence: Double
-    public let processingTimeMs: Int
     
-    public enum CodingKeys: String, CodingKey {
-        case city
-        case timestamp
-        case deviceModel = "device_model"
-        case iOSVersion = "ios_version"
-        case originalImageHash = "original_image_hash"
-        case croppedImageHash = "cropped_image_hash"
-        case ocrOutput = "ocr_output"
-        case userCorrection = "user_correction"
-        case confidence
-        case processingTimeMs = "processing_time_ms"
+    public init(records: [TelemetryRecord]) {
+        self.records = records
     }
 }
 

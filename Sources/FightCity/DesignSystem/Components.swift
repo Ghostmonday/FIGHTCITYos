@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FightCityFoundation
 
 // MARK: - Primary Button
 
@@ -172,9 +173,9 @@ public struct StatusBadge: View {
 
 public struct ConfidenceIndicator: View {
     let confidence: Double
-    let level: ConfidenceScorer.ConfidenceLevel
+    let level: String
     
-    public init(confidence: Double, level: ConfidenceScorer.ConfidenceLevel) {
+    public init(confidence: Double, level: String) {
         self.confidence = confidence
         self.level = level
     }

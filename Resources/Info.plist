@@ -2,8 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>BGTaskSchedulerPermittedIdentifiers</key>
+	<array>
+		<string>com.fightcitytickets.telemetry-upload</string>
+	</array>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<string>en</string>
 	<key>CFBundleDisplayName</key>
 	<string>FightCityTickets</string>
 	<key>CFBundleExecutable</key>
@@ -13,17 +17,25 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>$(PRODUCT_NAME)</string>
+	<string>FightCityTickets</string>
 	<key>CFBundlePackageType</key>
-	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
+	<key>CFBundleSupportedPlatforms</key>
+	<array>
+		<string>iPhoneOS</string>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>FightCityTickets needs camera access to scan parking ticket citation numbers using advanced Apple Intelligence document scanning.</string>
+	<string>FightCityTickets needs camera access to scan parking ticket citation numbers.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>FightCityTickets needs photo library access to save captured ticket images.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>FightCityTickets needs photo library access to import ticket photos.</string>
 	<key>UIApplicationSceneManifest</key>
@@ -43,10 +55,12 @@
 			</array>
 		</dict>
 	</dict>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>
-		<string></string>
+		<string>AccentColor</string>
 		<key>UIImageName</key>
 		<string></string>
 	</dict>
@@ -64,10 +78,6 @@
 		<string>UIInterfaceOrientationPortraitUpsideDown</string>
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>BGTaskSchedulerPermittedIdentifiers</key>
-	<array>
-		<string>com.fightcitytickets.telemetry-upload</string>
 	</array>
 </dict>
 </plist>

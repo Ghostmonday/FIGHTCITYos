@@ -22,7 +22,7 @@ public class DocumentScanCoordinator: NSObject {
     // MARK: - Properties
     
     private var documentCameraViewController: VNDocumentCameraViewController?
-    private let logger = Logger(subsystem: "com.fightcitytickets", category: "DocumentScanner")
+    private let logger = Logger.shared
     
     // MARK: - Initialization
     
@@ -69,7 +69,7 @@ public class DocumentScanCoordinator: NSObject {
     // MARK: - Document Processing
     
     /// Process the scanned document and extract the best page
-    private func processScannedDocument(_ scan: VNDocumentCameraScan) -> DocumentScanResult {
+    private func processScannedDocument(_ scan: VNDocumentCameraScan) -> DocumentScanResult.DocumentScanResultResult {
         logger.info("Processing scanned document with \(scan.pageCount) pages")
         
         guard scan.pageCount > 0 else {
@@ -79,10 +79,7 @@ public class DocumentScanCoordinator: NSObject {
         
         // Select the best page (typically page 0, but could implement smart selection)
         let bestPageIndex = selectBestPage(from: scan)
-        guard let bestImage = scan.imageOfPage(at: bestPageIndex) else {
-            logger.error("Failed to get image for page \(bestPageIndex)")
-            return .failed(.imageProcessingFailed)
-        }
+        let bestImage = scan.imageOfPage(at: bestPageIndex)
         
         // VisionKit automatically applies:
         // - Auto-cropping to document boundaries

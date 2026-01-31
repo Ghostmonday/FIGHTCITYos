@@ -16,6 +16,16 @@ public enum NavigationDestination: Hashable {
     case confirmation(CaptureResult)
     case history
     case settings
+    
+    public func hash(into hasher: inout Hasher) {
+        switch self {
+        case .onboarding: hasher.combine(0)
+        case .capture: hasher.combine(1)
+        case .confirmation(let result): hasher.combine(2); hasher.combine(result.id)
+        case .history: hasher.combine(3)
+        case .settings: hasher.combine(4)
+        }
+    }
 }
 
 /// Main coordinator for managing app navigation state
@@ -31,8 +41,12 @@ public final class AppCoordinator: ObservableObject {
         case telemetryOptIn
         case editCitation(CaptureResult)
         
-        public var id: Int {
-            hashValue
+        public var id: String {
+            switch self {
+            case .citySelection: return "citySelection"
+            case .telemetryOptIn: return "telemetryOptIn"
+            case .editCitation(let result): return "editCitation-\(result.extractedCitationNumber ?? "unknown")"
+            }
         }
     }
     
@@ -50,7 +64,7 @@ public final class AppCoordinator: ObservableObject {
     }
     
     public func navigateToRoot() {
-        navigationPath.removeAll()
+            navigationPath = NavigationPath()
     }
     
     // MARK: - Sheet Actions

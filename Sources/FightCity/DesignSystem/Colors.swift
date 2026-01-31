@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import FightCityFoundation
 
 // MARK: - App Colors
 
@@ -95,14 +96,16 @@ public extension Color {
         }
     }
     
-    static func confidenceColor(for level: ConfidenceScorer.ConfidenceLevel) -> Color {
-        switch level {
-        case .high:
+    static func confidenceColor(for level: String) -> Color {
+        switch level.lowercased() {
+        case "high":
             return AppColors.confidenceHigh
-        case .medium:
+        case "medium":
             return AppColors.confidenceMedium
-        case .low:
+        case "low":
             return AppColors.confidenceLow
+        default:
+            return AppColors.confidenceMedium
         }
     }
     

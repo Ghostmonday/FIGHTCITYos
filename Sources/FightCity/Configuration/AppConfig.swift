@@ -154,7 +154,7 @@ public final class AppConfig: ObservableObject {
         supportedCities.first { $0.id == cityId }
     }
     
-    public func cityConfig(for citationNumber: String) -> CityConfig? {
+    public func cityConfigFromCitationNumber(_ citationNumber: String) -> CityConfig? {
         // Check patterns in priority order (from backend CitationValidator)
         let priorityOrder = ["us-ca-san_francisco", "us-ny-new_york", "us-co-denver", "us-ca-los_angeles"]
         

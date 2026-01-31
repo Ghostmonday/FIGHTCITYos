@@ -8,7 +8,8 @@
 import Foundation
 
 /// Individual telemetry record (opt-in)
-public struct TelemetryRecord: Codable {
+public struct TelemetryRecord: Codable, Identifiable {
+    public var id: String
     public let city: String
     public let timestamp: Date
     public let deviceModel: String
@@ -21,6 +22,7 @@ public struct TelemetryRecord: Codable {
     public let processingTimeMs: Int
     
     public enum CodingKeys: String, CodingKey {
+        case id
         case city
         case timestamp
         case deviceModel = "device_model"
@@ -34,8 +36,9 @@ public struct TelemetryRecord: Codable {
     }
     
     public init(
+        id: String = UUID().uuidString,
         city: String,
-        timestamp: Date,
+        timestamp: Date = Date(),
         deviceModel: String,
         iOSVersion: String,
         originalImageHash: String,
@@ -45,6 +48,7 @@ public struct TelemetryRecord: Codable {
         confidence: Double,
         processingTimeMs: Int
     ) {
+        self.id = id
         self.city = city
         self.timestamp = timestamp
         self.deviceModel = deviceModel
