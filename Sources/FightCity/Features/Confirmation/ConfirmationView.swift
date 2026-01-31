@@ -21,6 +21,10 @@ public struct ConfirmationView: View {
     @State private var editedCitationNumber: String
     @State private var showEditSheet = false
     @State private var hasAppeared = false
+    @State private var showCertifiedMailSheet = false
+    @State private var generatedAppeal: String?
+    @State private var citation: Citation?
+    @State private var isGeneratingAppeal = false
     
     public init(
         captureResult: CaptureResult,
@@ -98,6 +102,14 @@ public struct ConfirmationView: View {
         }
         .sheet(isPresented: $showEditSheet) {
             editSheet
+        }
+        .sheet(isPresented: $showCertifiedMailSheet) {
+            if let citation = citation, let appealText = generatedAppeal {
+                CertifiedMailConfirmationSheet(
+                    citation: citation,
+                    appealText: appealText
+                )
+            }
         }
         .preferredColorScheme(.dark)
     }
@@ -352,27 +364,18 @@ public struct ConfirmationView: View {
             // Primary CTA
             Button(action: {
                 FCHaptics.success()
-                let result = CaptureResult(
-                    id: captureResult.id,
-                    originalImageData: captureResult.originalImageData,
-                    croppedImageData: captureResult.croppedImageData,
-                    rawText: captureResult.rawText,
-                    extractedCitationNumber: editedCitationNumber,
-                    extractedCityId: captureResult.extractedCityId,
-                    extractedDate: captureResult.extractedDate,
-                    confidence: captureResult.confidence,
-                    processingTimeMs: captureResult.processingTimeMs,
-                    boundingBoxes: captureResult.boundingBoxes,
-                    observations: captureResult.observations,
-                    capturedAt: captureResult.capturedAt
-                )
-                onConfirm(result)
+                generateAppealAndShowCertifiedMail()
             }) {
                 HStack(spacing: 8) {
-                    Text("Looks Good")
-                        .font(.system(size: 17, weight: .semibold))
-                    Image(systemName: "arrow.right")
-                        .font(.system(size: 15, weight: .semibold))
+                    if isGeneratingAppeal {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: AppColors.obsidian))
+                    } else {
+                        Text("Looks Good")
+                            .font(.system(size: 17, weight: .semibold))
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 15, weight: .semibold))
+                    }
                 }
                 .foregroundColor(AppColors.obsidian)
                 .frame(maxWidth: .infinity)
@@ -381,8 +384,8 @@ public struct ConfirmationView: View {
                 .cornerRadius(14)
                 .shadow(color: AppColors.gold.opacity(0.4), radius: 12, y: 6)
             }
-            .disabled(editedCitationNumber.isEmpty)
-            .opacity(editedCitationNumber.isEmpty ? 0.5 : 1)
+            .disabled(editedCitationNumber.isEmpty || isGeneratingAppeal)
+            .opacity(editedCitationNumber.isEmpty || isGeneratingAppeal ? 0.5 : 1)
             
             // Secondary actions
             HStack(spacing: 12) {
@@ -481,6 +484,70 @@ public struct ConfirmationView: View {
     private func formatCityId(_ cityId: String) -> String {
         let components = cityId.components(separatedBy: "-")
         return components.dropFirst().map { $0.capitalized }.joined(separator: " ")
+    }
+    
+    // MARK: - Appeal Generation
+    
+    private func generateAppealAndShowCertifiedMail() {
+        isGeneratingAppeal = true
+        
+        Task {
+            do {
+                // Create Citation from CaptureResult
+                let citation = Citation(
+                    citationNumber: editedCitationNumber,
+                    cityId: captureResult.extractedCityId,
+                    cityName: captureResult.extractedCityId?.replacingOccurrences(of: "us-", with: "").replacingOccurrences(of: "-", with: " ").capitalized,
+                    status: .validated
+                )
+                
+                // Generate appeal
+                let context = AppealContext(
+                    citationNumber: editedCitationNumber,
+                    cityName: citation.cityName ?? "Unknown",
+                    violationDate: parseDate(captureResult.extractedDate),
+                    userReason: "I am appealing this citation because I believe there are extenuating circumstances.",
+                    tone: .respectful
+                )
+                
+                let appealResult = await AppealWriter.shared.generateAppeal(for: context)
+                
+                await MainActor.run {
+                    self.citation = citation
+                    self.generatedAppeal = appealResult.appealText
+                    self.isGeneratingAppeal = false
+                    self.showCertifiedMailSheet = true
+                }
+            } catch {
+                await MainActor.run {
+                    isGeneratingAppeal = false
+                    // Show error or fallback
+                    // For now, just call onConfirm to continue with existing flow
+                    let result = CaptureResult(
+                        id: captureResult.id,
+                        originalImageData: captureResult.originalImageData,
+                        croppedImageData: captureResult.croppedImageData,
+                        rawText: captureResult.rawText,
+                        extractedCitationNumber: editedCitationNumber,
+                        extractedCityId: captureResult.extractedCityId,
+                        extractedDate: captureResult.extractedDate,
+                        confidence: captureResult.confidence,
+                        processingTimeMs: captureResult.processingTimeMs,
+                        boundingBoxes: captureResult.boundingBoxes,
+                        observations: captureResult.observations,
+                        capturedAt: captureResult.capturedAt
+                    )
+                    onConfirm(result)
+                }
+            }
+        }
+    }
+    
+    private func parseDate(_ dateString: String?) -> Date? {
+        guard let dateString = dateString else { return nil }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.date(from: dateString)
     }
 }
 

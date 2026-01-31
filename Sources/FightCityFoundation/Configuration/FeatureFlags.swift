@@ -27,6 +27,12 @@ public struct FeatureFlags {
     /// Enables NaturalLanguage processing for appeal writing assistance
     public static let naturalLanguageProcessing = false // Coming in Week 7
     
+    /// Enables DeepSeek AI refinement for statement processing
+    public static var deepSeekRefinement: Bool = true
+    
+    /// DeepSeek API key (loaded from environment or config)
+    public static var deepSeekAPIKey: String? = nil
+    
     /// Enables speech recognition for dictation features
     public static let speechRecognition = false // Coming in Week 7
     

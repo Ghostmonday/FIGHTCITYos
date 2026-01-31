@@ -210,7 +210,48 @@ public final class AppealWriter {
     /// Generate an appeal letter
     /// - Parameter context: Context information for the appeal
     /// - Returns: Generated appeal with analysis
-    public func generateAppeal(for context: AppealContext) -> AppealGenerationResult {
+    public func generateAppeal(for context: AppealContext) async -> AppealGenerationResult {
+        // Check if Apple Intelligence is available
+        if !FeatureFlags.isAppleIntelligenceEnabled || 
+           !FeatureFlags.naturalLanguageProcessing {
+            // Use fallback templates
+            let fallbackService = AppealFallbackService.shared
+            let template = fallbackService.selectBestTemplate(for: context)
+            return fallbackService.generateFromTemplate(template: template, context: context)
+        }
+        
+        // Try DeepSeek refinement first (if enabled)
+        if FeatureFlags.deepSeekRefinement {
+            do {
+                let request = StatementRefinementRequest(
+                    citationNumber: context.citationNumber,
+                    appealReason: context.userReason,
+                    userName: nil,
+                    cityId: context.cityName.lowercased(),
+                    violationDate: context.violationDate?.ISO8601Format()
+                )
+                
+                let response = try await DeepSeekRefinementService.shared.refineStatement(
+                    request,
+                    clientId: "app-\(UUID().uuidString)"
+                )
+                
+                // Convert to AppealGenerationResult
+                return AppealGenerationResult(
+                    appealText: response.refinedText,
+                    tone: context.tone,
+                    sentimentScore: 0.5,
+                    clarityScore: 0.9,
+                    suggestions: [],
+                    wordCount: response.refinedText.split(separator: " ").count,
+                    processingTimeMs: response.processingTimeMs
+                )
+            } catch {
+                // Fall through to Apple Intelligence or fallback
+            }
+        }
+        
+        // Use Apple Intelligence NaturalLanguage framework
         let startTime = Date()
         
         // Analyze user reason
@@ -227,7 +268,7 @@ public final class AppealWriter {
         
         let processingTimeMs = Int(Date().timeIntervalSince(startTime) * 1000)
         
-        return AppealGenerationResult(
+        let result = AppealGenerationResult(
             appealText: appealText,
             tone: context.tone,
             sentimentScore: analysis.sentimentScore,
@@ -236,6 +277,15 @@ public final class AppealWriter {
             wordCount: appealText.split(separator: " ").count,
             processingTimeMs: processingTimeMs
         )
+        
+        // If result is poor quality, fall back to templates
+        if result.clarityScore < 0.5 || appealText.isEmpty {
+            let fallbackService = AppealFallbackService.shared
+            let template = fallbackService.selectBestTemplate(for: context)
+            return fallbackService.generateFromTemplate(template: template, context: context)
+        }
+        
+        return result
     }
     
     /// Analyze text sentiment

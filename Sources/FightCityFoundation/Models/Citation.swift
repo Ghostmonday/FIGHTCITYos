@@ -30,6 +30,13 @@ public struct Citation: Identifiable, Codable, Equatable {
     public let createdAt: Date
     public let updatedAt: Date
     
+    // MARK: - Mailing Status (Certified Mail)
+    
+    public let mailingStatus: MailingStatus?
+    public let lobLetterId: String?
+    public let trackingNumber: String?
+    public let expectedDeliveryDate: Date?
+    
     public init(
         id: UUID = UUID(),
         citationNumber: String,
@@ -50,7 +57,11 @@ public struct Citation: Identifiable, Codable, Equatable {
         phoneConfirmationRequired: Bool = false,
         status: CitationStatus = .pending,
         createdAt: Date = Date(),
-        updatedAt: Date = Date()
+        updatedAt: Date = Date(),
+        mailingStatus: MailingStatus? = nil,
+        lobLetterId: String? = nil,
+        trackingNumber: String? = nil,
+        expectedDeliveryDate: Date? = nil
     ) {
         self.id = id
         self.citationNumber = citationNumber
@@ -72,6 +83,10 @@ public struct Citation: Identifiable, Codable, Equatable {
         self.status = status
         self.createdAt = createdAt
         self.updatedAt = updatedAt
+        self.mailingStatus = mailingStatus
+        self.lobLetterId = lobLetterId
+        self.trackingNumber = trackingNumber
+        self.expectedDeliveryDate = expectedDeliveryDate
     }
     
     // MARK: - Computed Properties
@@ -119,6 +134,10 @@ public struct Citation: Identifiable, Codable, Equatable {
         case status
         case created_at
         case updated_at
+        case mailing_status
+        case lob_letter_id
+        case tracking_number
+        case expected_delivery_date
     }
     
     public init(from decoder: Decoder) throws {
@@ -143,6 +162,10 @@ public struct Citation: Identifiable, Codable, Equatable {
         status = try container.decodeIfPresent(CitationStatus.self, forKey: .status) ?? .pending
         createdAt = try container.decodeIfPresent(Date.self, forKey: .created_at) ?? Date()
         updatedAt = try container.decodeIfPresent(Date.self, forKey: .updated_at) ?? Date()
+        mailingStatus = try container.decodeIfPresent(MailingStatus.self, forKey: .mailing_status)
+        lobLetterId = try container.decodeIfPresent(String.self, forKey: .lob_letter_id)
+        trackingNumber = try container.decodeIfPresent(String.self, forKey: .tracking_number)
+        expectedDeliveryDate = try container.decodeIfPresent(Date.self, forKey: .expected_delivery_date)
     }
     
     public func encode(to encoder: Encoder) throws {
@@ -167,6 +190,10 @@ public struct Citation: Identifiable, Codable, Equatable {
         try container.encode(status, forKey: .status)
         try container.encode(createdAt, forKey: .created_at)
         try container.encode(updatedAt, forKey: .updated_at)
+        try container.encodeIfPresent(mailingStatus, forKey: .mailing_status)
+        try container.encodeIfPresent(lobLetterId, forKey: .lob_letter_id)
+        try container.encodeIfPresent(trackingNumber, forKey: .tracking_number)
+        try container.encodeIfPresent(expectedDeliveryDate, forKey: .expected_delivery_date)
     }
 }
 
@@ -221,6 +248,29 @@ public enum DeadlineStatus {
         case .approaching: return "deadlineApproaching"
         case .urgent: return "deadlineUrgent"
         case .past: return "deadlineUrgent"
+        }
+    }
+}
+
+// MARK: - Mailing Status
+
+/// Status of certified mail delivery via Lob
+public enum MailingStatus: String, Codable {
+    case queued
+    case processing
+    case mailed
+    case inTransit = "in_transit"
+    case delivered
+    case returned
+    
+    public var displayName: String {
+        switch self {
+        case .queued: return "Queued"
+        case .processing: return "Processing"
+        case .mailed: return "Mailed"
+        case .inTransit: return "In Transit"
+        case .delivered: return "Delivered"
+        case .returned: return "Returned"
         }
     }
 }

@@ -267,6 +267,48 @@ struct CitationCard: View {
                 StatusPill(status: citation.status)
             }
             
+            // Mailing status (if certified mail was sent)
+            if let mailingStatus = citation.mailingStatus {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack(spacing: 8) {
+                        Image(systemName: mailingStatusIcon(mailingStatus))
+                            .font(.system(size: 14))
+                            .foregroundColor(mailingStatusColor(mailingStatus))
+                        Text("Certified Mail: \(mailingStatus.displayName)")
+                            .font(.system(size: 13, weight: .medium))
+                            .foregroundColor(mailingStatusColor(mailingStatus))
+                        
+                        if let trackingNumber = citation.trackingNumber {
+                            Spacer()
+                            Text("Tracking: \(trackingNumber)")
+                                .font(.system(size: 12))
+                                .foregroundColor(AppColors.textTertiary)
+                        }
+                    }
+                    
+                    // Return receipt confirmation
+                    if let events = MailTracker.shared.trackingEvents[citation.id.uuidString],
+                       let receiptEvent = events.first(where: { $0.name == "letter.certified.return_receipt_received" }) {
+                        HStack(spacing: 4) {
+                            Image(systemName: "signature")
+                                .foregroundColor(.green)
+                            Text("Delivery signature received")
+                                .font(.system(size: 12, weight: .medium))
+                                .foregroundColor(.green)
+                            Text("•")
+                                .foregroundColor(AppColors.textTertiary)
+                            Text(formatDate(receiptEvent.time))
+                                .font(.system(size: 12))
+                                .foregroundColor(AppColors.textTertiary)
+                        }
+                    }
+                }
+                .padding(.vertical, 8)
+                .padding(.horizontal, 12)
+                .background(mailingStatusColor(mailingStatus).opacity(0.1))
+                .cornerRadius(8)
+            }
+            
             Divider()
                 .background(AppColors.glassBorder)
             
@@ -335,6 +377,49 @@ struct CitationCard: View {
         } else {
             return AppColors.success
         }
+    }
+    
+    private func mailingStatusIcon(_ status: MailingStatus) -> String {
+        switch status {
+        case .queued: return "clock.fill"
+        case .processing: return "gearshape.fill"
+        case .mailed: return "envelope.fill"
+        case .inTransit: return "shippingbox.fill"
+        case .delivered: return "checkmark.circle.fill"
+        case .returned: return "arrow.uturn.backward.circle.fill"
+        }
+    }
+    
+    private func mailingStatusColor(_ status: MailingStatus) -> Color {
+        switch status {
+        case .queued, .processing: return AppColors.warning
+        case .mailed, .inTransit: return AppColors.gold
+        case .delivered: return AppColors.success
+        case .returned: return AppColors.error
+        }
+    }
+    
+    private func formatDate(_ dateString: String) -> String {
+        let formatter = ISO8601DateFormatter()
+        formatter.formatOptions = [.withInternetDateTime, .withFractionalSeconds]
+        
+        if let date = formatter.date(from: dateString) {
+            let displayFormatter = DateFormatter()
+            displayFormatter.dateStyle = .medium
+            displayFormatter.timeStyle = .short
+            return displayFormatter.string(from: date)
+        }
+        
+        // Fallback: try without fractional seconds
+        formatter.formatOptions = [.withInternetDateTime]
+        if let date = formatter.date(from: dateString) {
+            let displayFormatter = DateFormatter()
+            displayFormatter.dateStyle = .medium
+            displayFormatter.timeStyle = .short
+            return displayFormatter.string(from: date)
+        }
+        
+        return dateString
     }
 }
 

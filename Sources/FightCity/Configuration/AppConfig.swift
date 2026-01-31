@@ -135,6 +135,17 @@ public final class AppConfig: ObservableObject {
         UserDefaults.standard.set(enabled, forKey: "telemetryEnabled")
     }
     
+    // MARK: - Lob Proxy Configuration
+    
+    /// Backend proxy URL for Lob API (API key stored server-side)
+    public static var lobProxyURL: String? {
+        #if DEBUG
+        return "http://localhost:5000"  // Local development
+        #else
+        return "https://api.fightcitytickets.com"  // Production
+        #endif
+    }
+    
     // MARK: - API Endpoints
     
     public struct APIEndpoints {

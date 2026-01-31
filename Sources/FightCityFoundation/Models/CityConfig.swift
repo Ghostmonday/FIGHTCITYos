@@ -18,6 +18,7 @@ public struct CityConfig: Codable, Identifiable, Equatable {
     public let timezone: String
     public let deadlineDays: Int
     public let appealUrl: String?
+    public let mailingAddress: CityMailingAddress?
     
     public init(
         id: String,
@@ -28,7 +29,8 @@ public struct CityConfig: Codable, Identifiable, Equatable {
         citationPattern: String? = nil,
         timezone: String = "America/Los_Angeles",
         deadlineDays: Int = 21,
-        appealUrl: String? = nil
+        appealUrl: String? = nil,
+        mailingAddress: CityMailingAddress? = nil
     ) {
         self.id = id
         self.name = name
@@ -39,6 +41,7 @@ public struct CityConfig: Codable, Identifiable, Equatable {
         self.timezone = timezone
         self.deadlineDays = deadlineDays
         self.appealUrl = appealUrl
+        self.mailingAddress = mailingAddress
     }
 }
 
