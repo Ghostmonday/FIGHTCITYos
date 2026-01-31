@@ -87,6 +87,13 @@ public struct LobTrackingEvent: Codable {
     public let location: String?
     public let details: [String: String]? // Extra data (e.g., signature info)
     
+    public init(name: String, time: String, location: String?, details: [String: String]?) {
+        self.name = name
+        self.time = time
+        self.location = location
+        self.details = details
+    }
+    
     enum CodingKeys: String, CodingKey {
         case name, time, location, details
     }

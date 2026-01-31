@@ -152,21 +152,31 @@ public enum FCScale {
     public static let display: CGFloat = 2.0
 }
 
+// MARK: - System Font Modifier
+
+/// A ViewModifier that applies a system font with a specific size
+/// This helps avoid ambiguity with Font extensions
+public struct SystemFontModifier: ViewModifier {
+    let size: CGFloat
+    let weight: SwiftUI.Font.Weight
+    let design: SwiftUI.Font.Design
+    
+    public init(size: CGFloat, weight: SwiftUI.Font.Weight = .regular, design: SwiftUI.Font.Design = .default) {
+        self.size = size
+        self.weight = weight
+        self.design = design
+    }
+    
+    public func body(content: Content) -> some View {
+        content.font(SwiftUI.Font.system(size: size, weight: weight, design: design))
+    }
+}
+
 // MARK: - View Extensions
 
 extension View {
-    /// Apply spacing tokens
-    public func padding(_ edges: Edge.Set = .all, _ token: FCSpacing.Type = FCSpacing.self) -> some View {
-        padding(edges, token.md)
-    }
-    
-    /// Apply corner radius
-    public func cornerRadius(_ token: FCRadius.Type = FCRadius.self, _ style: FCRadius.Type = FCRadius.self) -> some View {
-        cornerRadius(token.md)
-    }
-    
-    /// Apply animation
-    public func animate(_ animation: Animation = FCAnimation.smooth) -> some View {
-        self.animation(animation)
+    /// Apply a system font with specified size (avoids ambiguity issues)
+    public func systemFont(size: CGFloat, weight: SwiftUI.Font.Weight = .regular, design: SwiftUI.Font.Design = .default) -> some View {
+        modifier(SystemFontModifier(size: size, weight: weight, design: design))
     }
 }

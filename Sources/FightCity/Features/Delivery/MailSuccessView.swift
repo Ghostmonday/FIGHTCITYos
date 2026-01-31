@@ -91,7 +91,7 @@ public struct MailSuccessView: View {
                 .frame(width: 100, height: 100)
             
             Image(systemName: "checkmark.circle.fill")
-                .font(.system(size: 64))
+                .font(SwiftUI.Font.system(size: 64))
                 .foregroundColor(AppColors.success)
         }
     }
@@ -101,12 +101,12 @@ public struct MailSuccessView: View {
     private var successMessage: some View {
         VStack(spacing: 12) {
             Text("Certified Mail Sent!")
-                .font(.system(size: 28, weight: .bold))
+                .font(SwiftUI.Font.system(size: 28, weight: .bold))
                 .foregroundColor(.white)
             
             Text("Your appeal letter has been sent via certified mail with tracking.")
-                .font(.system(size: 16))
-                .foregroundColor(AppColors.textSecondary)
+                .font(SwiftUI.Font.system(size: 16))
+                .foregroundColor(AppColors.textSecondary as Color)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
         }
@@ -118,13 +118,13 @@ public struct MailSuccessView: View {
         VStack(spacing: 16) {
             VStack(spacing: 8) {
                 Text("Tracking Number")
-                    .font(.system(size: 13, weight: .semibold))
+                    .font(SwiftUI.Font.system(size: 13, weight: .semibold))
                     .foregroundColor(AppColors.textTertiary)
                     .textCase(.uppercase)
                     .tracking(1)
                 
                 Text(trackingNumber)
-                    .font(.system(size: 20, weight: .bold, design: .monospaced))
+                    .font(SwiftUI.Font.system(size: 20, weight: .bold, design: .monospaced))
                     .foregroundColor(AppColors.gold)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 12)
@@ -139,10 +139,10 @@ public struct MailSuccessView: View {
             if let deliveryDate = expectedDeliveryDate {
                 HStack(spacing: 8) {
                     Image(systemName: "calendar")
-                        .font(.system(size: 14))
+                        .font(SwiftUI.Font.system(size: 14))
                         .foregroundColor(AppColors.textSecondary)
                     Text("Expected delivery: \(formatDeliveryDate(deliveryDate))")
-                        .font(.system(size: 14))
+                        .font(SwiftUI.Font.system(size: 14))
                         .foregroundColor(AppColors.textSecondary)
                 }
             }
@@ -166,9 +166,9 @@ public struct MailSuccessView: View {
             }) {
                 HStack(spacing: 8) {
                     Image(systemName: "location.fill")
-                        .font(.system(size: 16))
+                        .font(SwiftUI.Font.system(size: 16))
                     Text("Track Your Mail")
-                        .font(.system(size: 17, weight: .semibold))
+                        .font(SwiftUI.Font.system(size: 17, weight: .semibold))
                 }
                 .foregroundColor(AppColors.obsidian)
                 .frame(maxWidth: .infinity)
@@ -183,7 +183,7 @@ public struct MailSuccessView: View {
                 onDone()
             }) {
                 Text("Done")
-                    .font(.system(size: 16, weight: .medium))
+                    .font(SwiftUI.Font.system(size: 16, weight: .medium))
                     .foregroundColor(AppColors.gold)
                     .frame(maxWidth: .infinity)
                     .frame(height: 48)

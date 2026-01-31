@@ -7,6 +7,13 @@
 
 import SwiftUI
 import FightCityFoundation
+import FightCityiOS
+
+private struct PaddingModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        content.padding()
+    }
+}
 
 public struct TrackingTimelineView: View {
     let events: [LobTrackingEvent]
@@ -93,7 +100,7 @@ public struct TrackingTimelineView: View {
         Task {
             // Get letter ID from citation if available
             // For now, just refresh from MailTracker
-            if let letterId = mailTracker.trackedMailings[citationId] != nil ? nil : nil {
+            if let _ = mailTracker.trackedMailings[citationId] {
                 // Would need letterId to refresh - this is a placeholder
                 // In real implementation, citation would have lobLetterId
             }
@@ -207,34 +214,14 @@ struct TrackingTimelineView_Previews: PreviewProvider {
     static var previews: some View {
         TrackingTimelineView(
             events: [
-                LobTrackingEvent(
-                    name: "letter.certified.mailed",
-                    time: "2026-01-31T10:00:00Z",
-                    location: "San Francisco, CA",
-                    details: nil
-                ),
-                LobTrackingEvent(
-                    name: "letter.in_transit",
-                    time: "2026-01-31T14:00:00Z",
-                    location: "Oakland, CA",
-                    details: nil
-                ),
-                LobTrackingEvent(
-                    name: "letter.certified.delivered",
-                    time: "2026-02-01T09:00:00Z",
-                    location: "Los Angeles, CA",
-                    details: nil
-                ),
-                LobTrackingEvent(
-                    name: "letter.certified.return_receipt_received",
-                    time: "2026-02-01T09:15:00Z",
-                    location: "Los Angeles, CA",
-                    details: nil
-                )
+                LobTrackingEvent(name: "letter.certified.mailed", time: "2026-01-31T10:00:00Z", location: "San Francisco, CA", details: nil),
+                LobTrackingEvent(name: "letter.in_transit", time: "2026-01-31T14:00:00Z", location: "Oakland, CA", details: nil),
+                LobTrackingEvent(name: "letter.certified.delivered", time: "2026-02-01T09:00:00Z", location: "Los Angeles, CA", details: nil),
+                LobTrackingEvent(name: "letter.certified.return_receipt_received", time: "2026-02-01T09:15:00Z", location: "Los Angeles, CA", details: nil)
             ],
             citationId: "test-id"
         )
-        .padding()
+        .padding(Edge.Set.all)
         .background(AppColors.background)
     }
 }

@@ -95,12 +95,12 @@ public struct CitationDetailView: View {
     private var citationHeader: some View {
         VStack(spacing: 16) {
             Text(citation.citationNumber)
-                .font(.system(size: 32, weight: .bold, design: .monospaced))
+                .font(SwiftUI.Font.system(size: 32, weight: .bold, design: .monospaced))
                 .foregroundColor(.white)
             
             if let city = citation.cityName {
                 Text(city)
-                    .font(.system(size: 16))
+                    .font(SwiftUI.Font.system(size: 16))
                     .foregroundColor(AppColors.textSecondary)
             }
             
@@ -121,7 +121,7 @@ public struct CitationDetailView: View {
     private var citationDetails: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Citation Details")
-                .font(.system(size: 13, weight: .semibold))
+                .font(SwiftUI.Font.system(size: 13, weight: .semibold))
                 .foregroundColor(AppColors.textTertiary)
                 .textCase(.uppercase)
                 .tracking(1)
@@ -142,11 +142,11 @@ public struct CitationDetailView: View {
                 if let days = citation.daysRemaining {
                     HStack {
                         Text("Days Remaining")
-                            .font(.system(size: 15))
+                            .font(SwiftUI.Font.system(size: 15))
                             .foregroundColor(AppColors.textSecondary)
                         Spacer()
                         Text(deadlineText(days: days, isPast: citation.isPastDeadline))
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(SwiftUI.Font.system(size: 15, weight: .semibold))
                             .foregroundColor(deadlineColor(days: days, isPast: citation.isPastDeadline))
                     }
                 }
@@ -168,23 +168,23 @@ public struct CitationDetailView: View {
     private func detailRow(label: String, value: String) -> some View {
         HStack {
             Text(label)
-                .font(.system(size: 15))
+                .font(SwiftUI.Font.system(size: 15))
                 .foregroundColor(AppColors.textSecondary)
             Spacer()
             Text(value)
-                .font(.system(size: 15, weight: .medium))
+                .font(SwiftUI.Font.system(size: 15, weight: .medium))
                 .foregroundColor(.white)
         }
     }
     
-    private func detailRow<T: FormatStyle>(label: String, value: T.Input, format: T) -> some View where T.FormatOutput == String {
+    private func detailRow<Value: Equatable, Style: FormatStyle>(label: String, value: Value, format: Style) -> some View where Style.FormatInput == Value, Style.FormatOutput == String {
         HStack {
             Text(label)
-                .font(.system(size: 15))
+                .font(SwiftUI.Font.system(size: 15))
                 .foregroundColor(AppColors.textSecondary)
             Spacer()
             Text(value, format: format)
-                .font(.system(size: 15, weight: .medium))
+                .font(SwiftUI.Font.system(size: 15, weight: .medium))
                 .foregroundColor(.white)
         }
     }
@@ -194,23 +194,23 @@ public struct CitationDetailView: View {
     private var appealStatusSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("Appeal Status")
-                .font(.system(size: 13, weight: .semibold))
+                .font(SwiftUI.Font.system(size: 13, weight: .semibold))
                 .foregroundColor(AppColors.textTertiary)
                 .textCase(.uppercase)
                 .tracking(1)
             
             HStack(spacing: 12) {
                 Image(systemName: "doc.text.fill")
-                    .font(.system(size: 20))
+                    .font(SwiftUI.Font.system(size: 20))
                     .foregroundColor(AppColors.info)
                 
                 VStack(alignment: .leading, spacing: 4) {
                     Text(citation.status.displayName)
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(SwiftUI.Font.system(size: 16, weight: .semibold))
                         .foregroundColor(.white)
                     
                     Text("Your appeal is being reviewed")
-                        .font(.system(size: 14))
+                        .font(SwiftUI.Font.system(size: 14))
                         .foregroundColor(AppColors.textSecondary)
                 }
                 
@@ -240,9 +240,9 @@ public struct CitationDetailView: View {
                 }) {
                     HStack(spacing: 8) {
                         Image(systemName: "doc.on.doc")
-                            .font(.system(size: 14))
+                            .font(SwiftUI.Font.system(size: 14))
                         Text("Copy Tracking Number")
-                            .font(.system(size: 15, weight: .medium))
+                            .font(SwiftUI.Font.system(size: 15, weight: .medium))
                     }
                     .foregroundColor(AppColors.gold)
                     .frame(maxWidth: .infinity)
@@ -309,8 +309,8 @@ struct CitationDetailView_Previews: PreviewProvider {
                     citationNumber: "123456789",
                     cityId: "us-ca-san_francisco",
                     cityName: "San Francisco",
-                    amount: 75.00,
                     violationDate: "2026-01-15",
+                    amount: 75.00,
                     deadlineDate: "2026-02-15",
                     daysRemaining: 15,
                     status: .appealed,

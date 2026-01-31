@@ -535,7 +535,7 @@ struct EditCitationSheet: View {
                         .textCase(.uppercase)
                     
                     Text(result.extractedCitationNumber ?? "Not detected")
-                        .font(.system(size: 20, weight: .mono(.bold)))
+                        .font(.system(size: 20, weight: .bold, design: .monospaced))
                         .foregroundColor(AppColors.textSecondary)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

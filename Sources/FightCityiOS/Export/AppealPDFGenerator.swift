@@ -8,6 +8,7 @@
 import Foundation
 import UIKit
 import PDFKit
+import FightCityFoundation
 
 /// User contact information for appeal letters
 public struct UserContactInfo {

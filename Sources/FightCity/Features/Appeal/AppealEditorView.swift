@@ -9,6 +9,7 @@ import SwiftUI
 import FightCityFoundation
 import FightCityiOS
 
+
 public struct AppealEditorView: View {
     let citation: Citation
     let onContinue: (String) -> Void
@@ -101,16 +102,16 @@ public struct AppealEditorView: View {
     private var headerSection: some View {
         VStack(spacing: 12) {
             Image(systemName: "sparkles")
-                .font(.system(size: 48))
+                .font(SwiftUI.Font.system(size: 48))
                 .foregroundColor(AppColors.gold)
             
             Text("AI-Powered Appeal Refinement")
-                .font(.system(size: 22, weight: .bold))
+                .font(SwiftUI.Font.system(size: 22, weight: .bold))
                 .foregroundColor(.white)
             
             Text("Tell us why you're contesting this citation. Our AI will help refine your statement into a professional appeal letter.")
-                .font(.system(size: 15))
                 .foregroundColor(AppColors.textSecondary)
+                .modifier(SystemFontModifier(size: 15))
                 .multilineTextAlignment(.center)
                 .padding(.horizontal)
         }
@@ -122,9 +123,9 @@ public struct AppealEditorView: View {
     private var originalTextSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
-                Text("Your Appeal Reason")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundColor(AppColors.textTertiary)
+                    Text("Your Appeal Reason")
+                        .font(SwiftUI.Font.system(size: 13, weight: .semibold))
+                        .foregroundColor(AppColors.textTertiary)
                     .textCase(.uppercase)
                     .tracking(1)
                 
@@ -134,14 +135,14 @@ public struct AppealEditorView: View {
             ZStack(alignment: .topLeading) {
                 if viewModel.originalText.isEmpty {
                     Text("Example: I parked at a broken meter. I put money in but it showed zero time remaining.")
-                        .font(.system(size: 15))
+                        .font(SwiftUI.Font.system(size: 15))
                         .foregroundColor(AppColors.textTertiary)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 16)
                 }
                 
                 TextEditor(text: $viewModel.originalText)
-                    .font(.system(size: 15))
+                    .font(SwiftUI.Font.system(size: 15))
                     .foregroundColor(.white)
                     .frame(minHeight: 120)
                     .padding(8)
@@ -166,9 +167,9 @@ public struct AppealEditorView: View {
                             .progressViewStyle(CircularProgressViewStyle(tint: AppColors.obsidian))
                     } else {
                         Image(systemName: "sparkles")
-                            .font(.system(size: 14, weight: .semibold))
+                            .font(SwiftUI.Font.system(size: 14, weight: .semibold))
                         Text("Refine with AI")
-                            .font(.system(size: 15, weight: .semibold))
+                            .font(SwiftUI.Font.system(size: 15, weight: .semibold))
                     }
                 }
                 .foregroundColor(AppColors.obsidian)
@@ -184,9 +185,9 @@ public struct AppealEditorView: View {
             if let retryAfter = viewModel.rateLimitRetryAfter, retryAfter > 0 {
                 HStack(spacing: 4) {
                     Image(systemName: "clock.fill")
-                        .font(.system(size: 12))
+                        .font(SwiftUI.Font.system(size: 12))
                     Text("Rate limit: Try again in \(retryAfter)s")
-                        .font(.system(size: 13))
+                        .font(SwiftUI.Font.system(size: 13))
                 }
                 .foregroundColor(AppColors.warning)
             }
@@ -207,9 +208,9 @@ public struct AppealEditorView: View {
             HStack {
                 HStack(spacing: 6) {
                     Image(systemName: "sparkles")
-                        .font(.system(size: 12))
+                        .font(SwiftUI.Font.system(size: 12))
                     Text("Refined Appeal Letter")
-                        .font(.system(size: 13, weight: .semibold))
+                        .font(SwiftUI.Font.system(size: 13, weight: .semibold))
                         .foregroundColor(AppColors.textTertiary)
                         .textCase(.uppercase)
                         .tracking(1)
@@ -221,9 +222,9 @@ public struct AppealEditorView: View {
                 if viewModel.fallbackUsed {
                     HStack(spacing: 4) {
                         Image(systemName: "exclamationmark.triangle.fill")
-                            .font(.system(size: 10))
+                            .font(SwiftUI.Font.system(size: 10))
                         Text("Fallback")
-                            .font(.system(size: 11, weight: .medium))
+                            .font(SwiftUI.Font.system(size: 11, weight: .medium))
                     }
                     .foregroundColor(AppColors.warning)
                     .padding(.horizontal, 8)
@@ -234,7 +235,7 @@ public struct AppealEditorView: View {
             }
             
             TextEditor(text: $viewModel.refinedText)
-                .font(.system(size: 15))
+                .font(SwiftUI.Font.system(size: 15))
                 .foregroundColor(.white)
                 .frame(minHeight: 200)
                 .padding(12)
@@ -248,9 +249,9 @@ public struct AppealEditorView: View {
             if viewModel.processingTimeMs > 0 {
                 HStack(spacing: 4) {
                     Image(systemName: "clock.fill")
-                        .font(.system(size: 11))
+                        .font(SwiftUI.Font.system(size: 11))
                     Text("Processed in \(viewModel.processingTimeMs)ms")
-                        .font(.system(size: 12))
+                        .font(SwiftUI.Font.system(size: 12))
                 }
                 .foregroundColor(AppColors.textTertiary)
             }
@@ -269,11 +270,11 @@ public struct AppealEditorView: View {
     private func errorSection(_ error: String) -> some View {
         HStack(spacing: 12) {
             Image(systemName: "exclamationmark.circle.fill")
-                .font(.system(size: 18))
+                .font(SwiftUI.Font.system(size: 18))
                 .foregroundColor(AppColors.error)
             
             Text(error)
-                .font(.system(size: 14))
+                    .font(Font.system(size: 14))
                 .foregroundColor(AppColors.textSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -297,9 +298,9 @@ public struct AppealEditorView: View {
             }) {
                 HStack(spacing: 8) {
                     Text("Continue to Mail")
-                        .font(.system(size: 17, weight: .semibold))
+                        .font(SwiftUI.Font.system(size: 17, weight: .semibold))
                     Image(systemName: "arrow.right")
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(SwiftUI.Font.system(size: 15, weight: .semibold))
                 }
                 .foregroundColor(AppColors.obsidian)
                 .frame(maxWidth: .infinity)
