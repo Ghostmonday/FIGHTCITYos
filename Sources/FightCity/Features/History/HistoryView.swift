@@ -40,6 +40,7 @@ public struct HistoryView: View {
             .task {
                 await viewModel.loadCitations()
             }
+            .background(AppColors.background)
         }
     }
     
@@ -104,7 +105,7 @@ public struct HistoryView: View {
         }
         
         for citation in filtered {
-            let key = formatter.string(from: citation.violationDate ?? Date())
+            let key = citation.violationDate ?? "Unknown"
             groups[key, default: []].append(citation)
         }
         
@@ -130,7 +131,7 @@ public final class HistoryViewModel: ObservableObject {
         isLoading = true
         do {
             citations = try await storage.loadHistory()
-            citations.sort { ($0.violationDate ?? .distantPast) > ($1.violationDate ?? .distantPast) }
+            citations.sort { ($0.violationDate ?? "") > ($1.violationDate ?? "") }
         } catch {
             self.error = error
         }
@@ -198,7 +199,7 @@ struct CitationRow: View {
                 Spacer()
                 
                 if let date = citation.violationDate {
-                    Text(date, style: .date)
+                    Text(date)
                         .font(.caption)
                         .foregroundColor(.secondary)
                 }

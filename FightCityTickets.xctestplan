@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "28DE852D-A381-4F5E-9E20-4E335762F6B2",
+      "name" : "Test Scheme Action",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "performanceAntipatternCheckerEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:FightCityTickets.xcodeproj",
+        "identifier" : "A13EE1FDE448AB472A946C44",
+        "name" : "FightCityFoundationTests"
+      }
+    }
+  ],
+  "version" : 1
+}

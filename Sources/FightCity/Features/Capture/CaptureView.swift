@@ -63,7 +63,20 @@ public struct CaptureView: View {
         }
         .sheet(item: $viewModel.captureResult) { result in
             // Navigate to confirmation when capture is complete
-            ConfirmationView(result: result)
+            ConfirmationView(
+                captureResult: result,
+                onConfirm: { confirmedResult in
+                    // Save to history and continue
+                    viewModel.captureResult = nil
+                },
+                onRetake: {
+                    // Clear result and return to capture
+                    viewModel.captureResult = nil
+                },
+                onEdit: { editedNumber in
+                    // Handle edited citation number
+                }
+            )
                 .environmentObject(viewModel)
         }
     }
@@ -95,12 +108,13 @@ public struct CaptureView: View {
         Rectangle()
             .fill(Color.black)
             .overlay(
-                VStack {
+                VStack(spacing: 16) {
                     Image(systemName: "camera.fill")
                         .font(.system(size: 48))
                         .foregroundColor(.white.opacity(0.5))
                     Text("Camera Preview")
                         .foregroundColor(.white.opacity(0.5))
+                        .font(AppTypography.bodyMedium)
                 }
             )
     }

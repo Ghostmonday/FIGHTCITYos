@@ -14,9 +14,6 @@ import FightCityFoundation
 /// APPLE INTELLIGENCE: Wire Document Scanner/Live Text into capture flow
 /// APPLE INTELLIGENCE: Route OCR text through Core ML classifier prior to regex
 /// APPLE INTELLIGENCE: Enable dictation UI for appeal writing
-
-// APPLE INTELLIGENCE TODO: This ViewModel needs Apple Intelligence integration
-// Current state: Uses Vision OCR + preprocessing
 // Target state: VisionKit Document Scanner → Live Text → Core ML classifier → Regex fallback
 //
 // PHASE 1 Tasks:
@@ -86,11 +83,6 @@ public final class CaptureViewModel: ObservableObject, DocumentScanCoordinatorDe
     
     public func capturePhoto() async {
         processingState = .capturing
-        
-        guard let cameraManager = await cameraManager else {
-            processingState = .error("Camera not initialized")
-            return
-        }
         
         do {
             guard let imageData = try await cameraManager.capturePhoto() else {
@@ -232,50 +224,6 @@ public final class CaptureViewModel: ObservableObject, DocumentScanCoordinatorDe
         let qualityResult = frameAnalyzer.analyze(image)
         qualityWarning = qualityResult.warnings.isEmpty ? nil : qualityResult.feedbackMessage
         
-<<<<<<< HEAD
-=======
-        // Preprocess for OCR
-        let processedImage: UIImage
-        do {
-            processedImage = try await preprocessor.preprocess(image)
-        } catch {
-            // Log preprocessing error but continue with original image
-            // TODO: Replace with Logger.shared.warning("Image preprocessing failed", error: error)
-            print("Warning: Image preprocessing failed: \(error.localizedDescription)")
-            processedImage = image
-        }
-        
-        // Perform OCR
-        let ocrResult: OCREngine.RecognitionResult
-        do {
-            ocrResult = try await ocrEngine.recognizeText(in: processedImage)
-        } catch {
-            return CaptureResult(
-                originalImageData: data,
-                croppedImageData: processedImage.pngData(),
-                rawText: "",
-                confidence: 0,
-                processingTimeMs: Int(Date().timeIntervalSince(startTime) * 1000)
-            )
-        }
-        
-        // Parse citation number
-        let parsingResult = parsingEngine.parse(ocrResult.text)
-        
-        // Calculate confidence
-        let scoreResult = confidenceScorer.score(
-            rawText: ocrResult.text,
-            observations: ocrResult.observations,
-            matchedPattern: parsingResult.matchedPattern
-        )
-        
-        // Validate with API if we have a citation number
-        var citation: Citation?
-        if let citationNumber = parsingResult.citationNumber {
-            citation = await validateCitation(citationNumber, cityId: parsingResult.cityId)
-        }
-        
->>>>>>> 2127e328cc2a8ff67d681c13729a955c6e9e36aa
         let processingTimeMs = Int(Date().timeIntervalSince(startTime) * 1000)
         
         // Return basic capture result without OCR processing

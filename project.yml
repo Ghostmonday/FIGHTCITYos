@@ -135,7 +135,9 @@ targets:
           - "**/.DS_Store"
     dependencies:
       - target: FightCityiOS
+        embed: true
       - target: FightCityFoundation
+        embed: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.fightcitytickets.app
@@ -153,8 +155,9 @@ targets:
         IPHONEOS_DEPLOYMENT_TARGET: "17.0"
         TARGETED_DEVICE_FAMILY: "1,2"
         SUPPORTS_MACCATALYST: NO
-        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks"
+        LD_RUNPATH_SEARCH_PATHS: "$(inherited) @executable_path/Frameworks @loader_path/Frameworks"
         ALWAYS_SEARCH_USER_PATHS: NO
+        SWIFT_DEBUG_INFORMATION_LEVEL: "-gline-tables-only"
     frameworks:
       - Foundation
       - SwiftUI
@@ -200,10 +203,6 @@ targets:
           - UIInterfaceOrientationLandscapeRight
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
-          UISceneConfigurations:
-            UIWindowSceneSessionRoleApplication:
-              - UISceneConfigurationName: Default Configuration
-                UISceneDelegateClassName: $(PRODUCT_MODULE_NAME).SceneDelegate
         NSCameraUsageDescription: "FightCityTickets needs camera access to scan parking ticket citation numbers."
         NSPhotoLibraryUsageDescription: "FightCityTickets needs photo library access to import ticket photos."
         NSPhotoLibraryAddUsageDescription: "FightCityTickets needs photo library access to save captured ticket images."

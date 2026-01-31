@@ -72,20 +72,19 @@ public struct ContentView: View {
             // ConfirmationView requires init(result:onConfirm:onEdit:onRetake:)
             //
             // Fix:
-            // ConfirmationView(
-            //     result: capturedResult,
-            //     onConfirm: { result in
-            //         // Save to history
-            //         // Navigate to next step
-            //     },
-            //     onEdit: { result in
-            //         // Show edit sheet
-            //     },
-            //     onRetake: {
-            //         // Clear result and return to capture
-            //     }
-            // )
-            ConfirmationView(result: result)
+            ConfirmationView(
+                captureResult: result,
+                onConfirm: { result in
+                    // Save to history
+                    // Navigate to next step
+                },
+                onRetake: {
+                    // Clear result and return to capture
+                },
+                onEdit: { citationNumber in
+                    // Show edit sheet
+                }
+            )
             
         case .history:
             HistoryView()

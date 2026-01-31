@@ -46,6 +46,7 @@ public struct ConfirmationView: View {
         }
         .navigationTitle("Confirm")
         .navigationBarTitleDisplayMode(.inline)
+        .background(AppColors.background)
     }
     
     private var imagePreviewSection: some View {
@@ -133,9 +134,22 @@ public struct ConfirmationView: View {
     private var actionButtonsSection: some View {
         VStack(spacing: 12) {
             PrimaryButton(title: "Looks Good - Validate", action: {
-                var result = captureResult
-                result.extractedCitationNumber = editedCitationNumber
-                onConfirm(result)
+                // Create a new result with the edited citation number
+                let updatedResult = CaptureResult(
+                    id: captureResult.id,
+                    originalImageData: captureResult.originalImageData,
+                    croppedImageData: captureResult.croppedImageData,
+                    rawText: captureResult.rawText,
+                    extractedCitationNumber: editedCitationNumber,
+                    extractedCityId: captureResult.extractedCityId,
+                    extractedDate: captureResult.extractedDate,
+                    confidence: captureResult.confidence,
+                    processingTimeMs: captureResult.processingTimeMs,
+                    boundingBoxes: captureResult.boundingBoxes,
+                    observations: captureResult.observations,
+                    capturedAt: captureResult.capturedAt
+                )
+                onConfirm(updatedResult)
             })
             .disabled(editedCitationNumber.isEmpty)
             
@@ -259,7 +273,7 @@ public struct CitationDetailView: View {
                 HStack {
                     VStack(alignment: .leading, spacing: 4) {
                         if let deadline = citation.deadlineDate {
-                            Text(deadline, style: .date)
+                            Text(deadline)
                                 .font(.title3)
                                 .fontWeight(.semibold)
                         }

@@ -19,6 +19,10 @@ public enum AppColors {
     public static let secondary = Color("Secondary", bundle: nil)
     public static let secondaryVariant = Color("SecondaryVariant", bundle: nil)
     
+    // MARK: - Accent Colors
+    
+    public static let accent = Color("AccentColor", bundle: nil)
+    
     // MARK: - Background Colors
     
     public static let background = Color("Background", bundle: nil)
@@ -26,6 +30,10 @@ public enum AppColors {
     public static let surfaceVariant = Color("SurfaceVariant", bundle: nil)
     
     // MARK: - Text Colors
+    
+    public static let textPrimary = Color("TextPrimary", bundle: nil)
+    public static let textSecondary = Color("TextSecondary", bundle: nil)
+    public static let textTertiary = Color("TextTertiary", bundle: nil)
     
     public static let onPrimary = Color("OnPrimary", bundle: nil)
     public static let onSecondary = Color("OnSecondary", bundle: nil)

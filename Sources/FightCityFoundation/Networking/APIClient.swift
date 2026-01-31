@@ -197,11 +197,6 @@ public struct APIEndpoint {
     public static func telemetryUpload(_ request: TelemetryUploadRequest) -> APIEndpoint {
         APIEndpoint(path: APIEndpoints.telemetryUpload)
     }
-    
-    public static func ocrConfig(city: String) -> APIEndpoint {
-        let item = URLQueryItem(name: "city", value: city)
-        return APIEndpoint(path: APIEndpoints.ocrConfig(city: city), queryItems: [item])
-    }
 }
 
 // MARK: - Telemetry Upload (Types defined in Models/TelemetryRecord.swift)

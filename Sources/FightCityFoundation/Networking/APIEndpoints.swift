@@ -55,12 +55,7 @@ public enum APIEndpoints {
     // MARK: - Mobile (iOS Specific)
     
     /// Upload telemetry data
-    public static let telemetryUpload = "\(mobile)/ocr/telemetry"
-    
-    /// Get OCR configuration for a city
-    public static func ocrConfig(city: String) -> String {
-        "\(mobile)/ocr/config?city=\(city)"
-    }
+    public static let telemetryUpload = "\(mobile)/telemetry"
     
     // MARK: - Auth
     

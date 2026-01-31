@@ -37,17 +37,6 @@ public final class AppConfig: ObservableObject {
     /// Base URL for the web frontend (for deep links)
     @Published public var webBaseURL: URL
     
-    // MARK: - OCR Configuration
-    
-    /// Minimum confidence threshold for auto-accepting OCR results
-    public let ocrConfidenceThreshold: Double = 0.85
-    
-    /// Fallback confidence threshold requiring user review
-    public let ocrReviewThreshold: Double = 0.60
-    
-    /// Maximum image dimensions for OCR processing
-    public let ocrMaxImageDimension: CGFloat = 1920
-    
     // MARK: - Telemetry Configuration
     
     /// Whether telemetry collection is enabled
@@ -114,7 +103,7 @@ public final class AppConfig: ObservableObject {
     
     // MARK: - Initialization
     
-    private init() {
+    public init() {
         // Configure based on build environment
         #if DEBUG
         guard let apiURL = URL(string: "http://localhost:8000"),
@@ -154,8 +143,7 @@ public final class AppConfig: ObservableObject {
         public static let validateTicket = "/tickets/validate"
         public static let appealSubmit = "/api/appeals"
         public static let statusLookup = "/api/status/lookup"
-        public static let telemetryUpload = "/mobile/ocr/telemetry"
-        public static let ocrConfig = "/mobile/ocr/config"
+        public static let telemetryUpload = "/mobile/telemetry"
     }
     
     // MARK: - Utility
