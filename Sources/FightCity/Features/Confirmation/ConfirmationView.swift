@@ -2,13 +2,15 @@
 //  ConfirmationView.swift
 //  FightCity
 //
-//  View for confirming extracted citation details
+//  Premium confirmation flow with confidence visualization
+//  Apple Design Award quality details display
 //
 
 import SwiftUI
 import FightCityiOS
 import FightCityFoundation
-import FightCityiOS
+
+// MARK: - Confirmation View
 
 public struct ConfirmationView: View {
     let captureResult: CaptureResult
@@ -18,8 +20,14 @@ public struct ConfirmationView: View {
     
     @State private var editedCitationNumber: String
     @State private var showEditSheet = false
+    @State private var hasAppeared = false
     
-    public init(captureResult: CaptureResult, onConfirm: @escaping (CaptureResult) -> Void, onRetake: @escaping () -> Void, onEdit: @escaping (String) -> Void) {
+    public init(
+        captureResult: CaptureResult,
+        onConfirm: @escaping (CaptureResult) -> Void,
+        onRetake: @escaping () -> Void,
+        onEdit: @escaping (String) -> Void
+    ) {
         self.captureResult = captureResult
         self.onConfirm = onConfirm
         self.onRetake = onRetake
@@ -28,52 +36,163 @@ public struct ConfirmationView: View {
     }
     
     public var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                // Image preview
-                imagePreviewSection
-                
-                // Citation details
-                citationDetailsSection
-                
-                // Confidence indicator
-                confidenceSection
-                
-                // Action buttons
-                actionButtonsSection
+        ZStack {
+            AppColors.background
+                .ignoresSafeArea()
+            
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 24) {
+                    // Image preview
+                    imagePreview
+                        .opacity(hasAppeared ? 1 : 0)
+                        .offset(y: hasAppeared ? 0 : 20)
+                        .animation(.easeOut(duration: 0.4), value: hasAppeared)
+                    
+                    // Extracted data card
+                    extractedDataCard
+                        .opacity(hasAppeared ? 1 : 0)
+                        .offset(y: hasAppeared ? 0 : 20)
+                        .animation(.easeOut(duration: 0.4).delay(0.1), value: hasAppeared)
+                    
+                    // Confidence indicator
+                    confidenceCard
+                        .opacity(hasAppeared ? 1 : 0)
+                        .offset(y: hasAppeared ? 0 : 20)
+                        .animation(.easeOut(duration: 0.4).delay(0.2), value: hasAppeared)
+                    
+                    // Next steps
+                    nextStepsCard
+                        .opacity(hasAppeared ? 1 : 0)
+                        .offset(y: hasAppeared ? 0 : 20)
+                        .animation(.easeOut(duration: 0.4).delay(0.3), value: hasAppeared)
+                    
+                    // Action buttons
+                    actionButtons
+                        .opacity(hasAppeared ? 1 : 0)
+                        .animation(.easeOut(duration: 0.4).delay(0.4), value: hasAppeared)
+                    
+                    Spacer(minLength: 40)
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 20)
             }
-            .padding()
         }
         .navigationTitle("Confirm")
         .navigationBarTitleDisplayMode(.inline)
-        .background(AppColors.background)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: {
+                    FCHaptics.lightImpact()
+                    onRetake()
+                }) {
+                    Image(systemName: "chevron.left")
+                        .foregroundColor(AppColors.gold)
+                }
+            }
+        }
+        .onAppear {
+            FCHaptics.prepare()
+            withAnimation {
+                hasAppeared = true
+            }
+        }
+        .sheet(isPresented: $showEditSheet) {
+            editSheet
+        }
+        .preferredColorScheme(.dark)
     }
     
-    private var imagePreviewSection: some View {
+    // MARK: - Image Preview
+    
+    private var imagePreview: some View {
         Group {
-            if let imageData = captureResult.croppedImageData,
+            if let imageData = captureResult.croppedImageData ?? captureResult.originalImageData,
                let uiImage = UIImage(data: imageData) {
                 Image(uiImage: uiImage)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(maxHeight: 200)
-                    .cornerRadius(12)
+                    .frame(maxHeight: 180)
+                    .cornerRadius(16)
                     .overlay(
-                        RoundedRectangle(cornerRadius: 12)
-                            .stroke(Color.secondary.opacity(0.3), lineWidth: 1)
+                        RoundedRectangle(cornerRadius: 16)
+                            .stroke(AppColors.glassBorder, lineWidth: 1)
+                    )
+                    .shadow(color: Color.black.opacity(0.3), radius: 10, y: 5)
+            } else {
+                // Placeholder when no image
+                RoundedRectangle(cornerRadius: 16)
+                    .fill(AppColors.surface)
+                    .frame(height: 120)
+                    .overlay(
+                        VStack(spacing: 8) {
+                            Image(systemName: "photo")
+                                .font(.system(size: 32))
+                                .foregroundColor(AppColors.textTertiary)
+                            Text("Manual Entry")
+                                .font(.system(size: 14))
+                                .foregroundColor(AppColors.textTertiary)
+                        }
                     )
             }
         }
     }
     
-    private var citationDetailsSection: some View {
+    // MARK: - Extracted Data Card
+    
+    private var extractedDataCard: some View {
         VStack(alignment: .leading, spacing: 16) {
-            Text("Extracted Details")
-                .font(.headline)
-            
-            VStack(spacing: 12) {
-                detailRow(label: "Citation Number", value: captureResult.extractedCitationNumber ?? "Not detected", isEditable: true)
+            HStack {
+                Text("Extracted Details")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(AppColors.textTertiary)
+                    .textCase(.uppercase)
+                    .tracking(1)
                 
+                Spacer()
+                
+                // AI badge
+                HStack(spacing: 4) {
+                    Image(systemName: "sparkles")
+                        .font(.system(size: 10))
+                    Text("AI")
+                        .font(.system(size: 11, weight: .semibold))
+                }
+                .foregroundColor(AppColors.gold)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(AppColors.gold.opacity(0.15))
+                .cornerRadius(12)
+            }
+            
+            VStack(spacing: 16) {
+                // Citation number (main)
+                HStack {
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Citation Number")
+                            .font(.system(size: 13))
+                            .foregroundColor(AppColors.textSecondary)
+                        
+                        Text(editedCitationNumber.isEmpty ? "Not detected" : editedCitationNumber)
+                            .font(.system(size: 24, weight: .bold, design: .monospaced))
+                            .foregroundColor(.white)
+                    }
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        FCHaptics.lightImpact()
+                        showEditSheet = true
+                    }) {
+                        Image(systemName: "pencil.circle.fill")
+                            .font(.system(size: 28))
+                            .foregroundColor(AppColors.gold)
+                    }
+                }
+                
+                Divider()
+                    .background(AppColors.glassBorder)
+                
+                // Additional details
                 if let cityId = captureResult.extractedCityId {
                     detailRow(label: "City", value: formatCityId(cityId))
                 }
@@ -82,60 +201,158 @@ public struct ConfirmationView: View {
                     detailRow(label: "Violation Date", value: date)
                 }
             }
-            .padding()
-            .background(Color(.secondarySystemBackground))
-            .cornerRadius(12)
+            .padding(16)
+            .background(AppColors.surface)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(AppColors.glassBorder, lineWidth: 1)
+            )
         }
     }
     
-    private func detailRow(label: String, value: String, isEditable: Bool = false) -> some View {
+    private func detailRow(label: String, value: String) -> some View {
         HStack {
             Text(label)
-                .foregroundColor(.secondary)
+                .font(.system(size: 15))
+                .foregroundColor(AppColors.textSecondary)
             Spacer()
             Text(value)
-                .fontWeight(.medium)
-                .multilineTextAlignment(.trailing)
-            if isEditable {
-                Button(action: {
-                    showEditSheet = true
-                }) {
-                    Image(systemName: "pencil.circle")
-                        .foregroundColor(.accentColor)
+                .font(.system(size: 15, weight: .medium))
+                .foregroundColor(.white)
+        }
+    }
+    
+    // MARK: - Confidence Card
+    
+    private var confidenceCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Recognition Confidence")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(AppColors.textTertiary)
+                .textCase(.uppercase)
+                .tracking(1)
+            
+            HStack(spacing: 16) {
+                // Progress ring
+                ZStack {
+                    Circle()
+                        .stroke(AppColors.surface, lineWidth: 8)
+                        .frame(width: 60, height: 60)
+                    
+                    Circle()
+                        .trim(from: 0, to: captureResult.confidence)
+                        .stroke(
+                            confidenceColor,
+                            style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                        )
+                        .frame(width: 60, height: 60)
+                        .rotationEffect(.degrees(-90))
+                    
+                    Text("\(Int(captureResult.confidence * 100))%")
+                        .font(.system(size: 16, weight: .bold))
+                        .foregroundColor(.white)
+                }
+                
+                VStack(alignment: .leading, spacing: 4) {
+                    Text(confidenceLevel)
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(confidenceColor)
+                    
+                    Text(confidenceMessage)
+                        .font(.system(size: 14))
+                        .foregroundColor(AppColors.textSecondary)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
+            .padding(16)
+            .background(AppColors.surface)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(AppColors.glassBorder, lineWidth: 1)
+            )
         }
     }
     
-    private var confidenceSection: some View {
-        VStack(spacing: 8) {
-            HStack {
-                Text("Recognition Confidence")
-                    .font(.subheadline)
-                    .foregroundColor(.secondary)
-                Spacer()
-                ConfidenceIndicator(
-                    confidence: captureResult.confidence,
-                    level: confidenceLevel(for: captureResult.confidence)
-                )
-            }
+    private var confidenceColor: Color {
+        if captureResult.confidence >= 0.85 {
+            return AppColors.success
+        } else if captureResult.confidence >= 0.60 {
+            return AppColors.warning
+        } else {
+            return AppColors.error
+        }
+    }
+    
+    private var confidenceLevel: String {
+        if captureResult.confidence >= 0.85 {
+            return "High Confidence"
+        } else if captureResult.confidence >= 0.60 {
+            return "Medium Confidence"
+        } else {
+            return "Low Confidence"
+        }
+    }
+    
+    private var confidenceMessage: String {
+        if captureResult.confidence >= 0.85 {
+            return "Text was clearly recognized."
+        } else if captureResult.confidence >= 0.60 {
+            return "Please verify the details are correct."
+        } else {
+            return "Consider retaking the photo for better accuracy."
+        }
+    }
+    
+    // MARK: - Next Steps Card
+    
+    private var nextStepsCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("What Happens Next")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(AppColors.textTertiary)
+                .textCase(.uppercase)
+                .tracking(1)
             
-            if captureResult.confidence < 0.85 {
-                Text(confidenceMessage(for: captureResult.confidence))
-                    .font(.caption)
-                    .foregroundColor(.orange)
+            VStack(spacing: 12) {
+                nextStepRow(icon: "checkmark.circle.fill", text: "Verify this citation exists", color: AppColors.success)
+                nextStepRow(icon: "calendar", text: "Check appeal deadlines", color: AppColors.warning)
+                nextStepRow(icon: "sparkles", text: "AI will help draft your appeal", color: AppColors.gold)
             }
+            .padding(16)
+            .background(AppColors.surface)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(AppColors.glassBorder, lineWidth: 1)
+            )
         }
-        .padding()
-        .background(Color(.secondarySystemBackground))
-        .cornerRadius(12)
     }
     
-    private var actionButtonsSection: some View {
+    private func nextStepRow(icon: String, text: String, color: Color) -> some View {
+        HStack(spacing: 12) {
+            Image(systemName: icon)
+                .font(.system(size: 18))
+                .foregroundColor(color)
+                .frame(width: 24)
+            
+            Text(text)
+                .font(.system(size: 15))
+                .foregroundColor(AppColors.textSecondary)
+            
+            Spacer()
+        }
+    }
+    
+    // MARK: - Action Buttons
+    
+    private var actionButtons: some View {
         VStack(spacing: 12) {
-            PrimaryButton(title: "Looks Good - Validate", action: {
-                // Create a new result with the edited citation number
-                let updatedResult = CaptureResult(
+            // Primary CTA
+            Button(action: {
+                FCHaptics.success()
+                let result = CaptureResult(
                     id: captureResult.id,
                     originalImageData: captureResult.originalImageData,
                     croppedImageData: captureResult.croppedImageData,
@@ -149,31 +366,117 @@ public struct ConfirmationView: View {
                     observations: captureResult.observations,
                     capturedAt: captureResult.capturedAt
                 )
-                onConfirm(updatedResult)
-            })
+                onConfirm(result)
+            }) {
+                HStack(spacing: 8) {
+                    Text("Looks Good")
+                        .font(.system(size: 17, weight: .semibold))
+                    Image(systemName: "arrow.right")
+                        .font(.system(size: 15, weight: .semibold))
+                }
+                .foregroundColor(AppColors.obsidian)
+                .frame(maxWidth: .infinity)
+                .frame(height: 56)
+                .background(AppColors.goldGradient)
+                .cornerRadius(14)
+                .shadow(color: AppColors.gold.opacity(0.4), radius: 12, y: 6)
+            }
             .disabled(editedCitationNumber.isEmpty)
+            .opacity(editedCitationNumber.isEmpty ? 0.5 : 1)
             
-            SecondaryButton(title: "Edit Number", action: {
-                showEditSheet = true
-            })
-            
-            TertiaryButton(title: "Retake Photo", action: onRetake)
+            // Secondary actions
+            HStack(spacing: 12) {
+                Button(action: {
+                    FCHaptics.lightImpact()
+                    showEditSheet = true
+                }) {
+                    Text("Edit")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(AppColors.gold)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 48)
+                        .background(AppColors.surface)
+                        .cornerRadius(12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(AppColors.gold.opacity(0.3), lineWidth: 1)
+                        )
+                }
+                
+                Button(action: {
+                    FCHaptics.lightImpact()
+                    onRetake()
+                }) {
+                    Text("Retake")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundColor(AppColors.textSecondary)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 48)
+                        .background(AppColors.surface)
+                        .cornerRadius(12)
+                }
+            }
         }
+        .padding(.top, 8)
     }
     
-    private func confidenceLevel(for confidence: Double) -> String {
-        if confidence >= 0.85 { return "high" }
-        if confidence >= 0.60 { return "medium" }
-        return "low"
+    // MARK: - Edit Sheet
+    
+    private var editSheet: some View {
+        NavigationStack {
+            VStack(spacing: 24) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Citation Number")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(AppColors.textTertiary)
+                        .textCase(.uppercase)
+                    
+                    TextField("", text: $editedCitationNumber)
+                        .font(.system(size: 28, weight: .bold, design: .monospaced))
+                        .foregroundColor(.white)
+                        .textInputAutocapitalization(.characters)
+                        .padding(16)
+                        .background(AppColors.surface)
+                        .cornerRadius(12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(AppColors.gold.opacity(0.5), lineWidth: 2)
+                        )
+                }
+                
+                Spacer()
+                
+                Button(action: {
+                    FCHaptics.success()
+                    showEditSheet = false
+                }) {
+                    Text("Done")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(AppColors.obsidian)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                        .background(AppColors.goldGradient)
+                        .cornerRadius(14)
+                }
+            }
+            .padding(24)
+            .background(AppColors.background)
+            .navigationTitle("Edit Citation")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        showEditSheet = false
+                    }
+                    .foregroundColor(AppColors.gold)
+                }
+            }
+        }
+        .presentationDetents([.medium])
+        .presentationDragIndicator(.visible)
     }
     
-    private func confidenceMessage(for confidence: Double) -> String {
-        if confidence < 0.60 {
-            return "Confidence is low. Please verify the citation number carefully or retake the photo."
-        } else {
-            return "Confidence is medium. Please verify the extracted information is correct."
-        }
-    }
+    // MARK: - Helpers
     
     private func formatCityId(_ cityId: String) -> String {
         let components = cityId.components(separatedBy: "-")
@@ -181,157 +484,25 @@ public struct ConfirmationView: View {
     }
 }
 
-// MARK: - Tertiary Button
+// MARK: - Previews
 
-struct TertiaryButton: View {
-    let title: String
-    let action: () -> Void
-    
-    var body: some View {
-        Button(action: action) {
-            Text(title)
-                .font(.subheadline)
-                .foregroundColor(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, 12)
-    }
-}
-
-// MARK: - Citation Detail View
-
-public struct CitationDetailView: View {
-    let citation: Citation
-    
-    @State private var showPaymentSheet = false
-    @State private var showAppealSheet = false
-    
-    public init(citation: Citation) {
-        self.citation = citation
-    }
-    
-    public var body: some View {
-        ScrollView {
-            VStack(spacing: 24) {
-                // Header card
-                headerCard
-                
-                // Deadline card
-                deadlineCard
-                
-                // Actions
-                actionButtons
-            }
-            .padding()
-        }
-        .navigationTitle("Citation Details")
-        .navigationBarTitleDisplayMode(.inline)
-    }
-    
-    private var headerCard: some View {
-        CardView {
-            VStack(alignment: .leading, spacing: 16) {
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text(citation.citationNumber)
-                            .font(.title2)
-                            .fontWeight(.bold)
-                        
-                        if let city = citation.cityName {
-                            Text(city)
-                                .font(.subheadline)
-                                .foregroundColor(.secondary)
-                        }
-                    }
-                    
-                    Spacer()
-                    
-                    StatusBadge(status: citation.status)
-                }
-                
-                if let amount = citation.amount {
-                    Divider()
-                    HStack {
-                        Text("Amount Due")
-                            .foregroundColor(.secondary)
-                        Spacer()
-                        Text(amount, format: .currency(code: "USD"))
-                            .font(.title3)
-                            .fontWeight(.semibold)
-                    }
-                }
-            }
-        }
-    }
-    
-    private var deadlineCard: some View {
-        CardView {
-            VStack(alignment: .leading, spacing: 12) {
-                Text("Deadline")
-                    .font(.headline)
-                
-                HStack {
-                    VStack(alignment: .leading, spacing: 4) {
-                        if let deadline = citation.deadlineDate {
-                            Text(deadline)
-                                .font(.title3)
-                                .fontWeight(.semibold)
-                        }
-                        
-                        if let days = citation.daysRemaining {
-                            Text("\(days) days remaining")
-                                .font(.subheadline)
-                                .foregroundColor(deadlineColor)
-                        }
-                    }
-                    
-                    Spacer()
-                    
-                    Image(systemName: deadlineIcon)
-                        .font(.largeTitle)
-                        .foregroundColor(deadlineColor)
-                }
-            }
-        }
-    }
-    
-    private var deadlineColor: Color {
-        if citation.isPastDeadline {
-            return .red
-        } else if let days = citation.daysRemaining, days <= 7 {
-            return .orange
-        }
-        return .green
-    }
-    
-    private var deadlineIcon: String {
-        if citation.isPastDeadline {
-            return "exclamationmark.triangle.fill"
-        } else if let days = citation.daysRemaining, days <= 7 {
-            return "clock.fill"
-        }
-        return "checkmark.circle.fill"
-    }
-    
-    private var actionButtons: some View {
-        VStack(spacing: 12) {
-            if citation.status != .paid {
-                PrimaryButton(title: "Pay Fine", action: {
-                    showPaymentSheet = true
-                })
-            }
-            
-            if citation.canAppealOnline && !citation.isPastDeadline {
-                SecondaryButton(title: "File Appeal", action: {
-                    showAppealSheet = true
-                })
-            }
-            
-            if !citation.isPastDeadline {
-                TertiaryButton(title: "Set Reminder", action: {
-                    // Set reminder logic
-                })
-            }
+#if DEBUG
+struct ConfirmationView_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationStack {
+            ConfirmationView(
+                captureResult: CaptureResult(
+                    rawText: "SFMTA12345678",
+                    extractedCitationNumber: "SFMTA12345678",
+                    extractedCityId: "us-ca-san_francisco",
+                    confidence: 0.92,
+                    processingTimeMs: 1500
+                ),
+                onConfirm: { _ in },
+                onRetake: {},
+                onEdit: { _ in }
+            )
         }
     }
 }
+#endif

@@ -2,8 +2,8 @@
 //  FightCityApp.swift
 //  FightCity
 //
-//  Native iOS app for scanning and validating parking citations
-//  Integrates with existing FastAPI backend
+//  Premium parking ticket fighting app
+//  Powered by Apple Intelligence
 //
 
 import SwiftUI
@@ -16,7 +16,7 @@ struct FightCityApp: App {
     @StateObject private var appConfig = AppConfig()
     
     init() {
-        configureAppearance()
+        configurePremiumAppearance()
     }
     
     var body: some Scene {
@@ -24,14 +24,41 @@ struct FightCityApp: App {
             ContentView()
                 .environmentObject(appCoordinator)
                 .environmentObject(appConfig)
+                .preferredColorScheme(.dark) // Luxury dark theme
         }
     }
     
-    private func configureAppearance() {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor(AppColors.background)
-        UINavigationBar.appearance().standardAppearance = appearance
-        UINavigationBar.appearance().scrollEdgeAppearance = appearance
+    /// Configure premium appearance for navigation bars, tab bars, and system UI
+    private func configurePremiumAppearance() {
+        // Navigation bar
+        let navAppearance = UINavigationBarAppearance()
+        navAppearance.configureWithOpaqueBackground()
+        navAppearance.backgroundColor = UIColor(AppColors.obsidian)
+        navAppearance.titleTextAttributes = [
+            .foregroundColor: UIColor.white,
+            .font: UIFont.systemFont(ofSize: 17, weight: .semibold)
+        ]
+        navAppearance.largeTitleTextAttributes = [
+            .foregroundColor: UIColor.white,
+            .font: UIFont.systemFont(ofSize: 34, weight: .bold)
+        ]
+        UINavigationBar.appearance().standardAppearance = navAppearance
+        UINavigationBar.appearance().scrollEdgeAppearance = navAppearance
+        UINavigationBar.appearance().compactAppearance = navAppearance
+        UINavigationBar.appearance().tintColor = UIColor(AppColors.gold)
+        
+        // Tab bar
+        let tabAppearance = UITabBarAppearance()
+        tabAppearance.configureWithOpaqueBackground()
+        tabAppearance.backgroundColor = UIColor(AppColors.surface)
+        UITabBar.appearance().standardAppearance = tabAppearance
+        UITabBar.appearance().scrollEdgeAppearance = tabAppearance
+        UITabBar.appearance().tintColor = UIColor(AppColors.gold)
+        
+        // Text field
+        UITextField.appearance().tintColor = UIColor(AppColors.gold)
+        
+        // Scroll indicators
+        UIScrollView.appearance().indicatorStyle = .white
     }
 }

@@ -137,15 +137,21 @@ public struct FCCard<Content: View>: View {
     }
     
     public var body: some View {
-        content
-            .if(hasPadding) { view in
-                view.padding(FCSpacing.cardPadding)
+        Group {
+            if hasPadding {
+                content.padding(FCSpacing.cardPadding)
+            } else {
+                content
             }
-            .background(AppColors.surface)
-            .cornerRadius(cornerRadius)
-            .if let shadow = shadowStyle { view in
-                shadow.apply(to: view)
-            }
+        }
+        .background(AppColors.surface)
+        .cornerRadius(cornerRadius)
+        .shadow(
+            color: shadowStyle.map { Color.black.opacity($0.opacity) } ?? .clear,
+            radius: shadowStyle?.radius ?? 0,
+            x: shadowStyle?.x ?? 0,
+            y: shadowStyle?.y ?? 0
+        )
     }
 }
 

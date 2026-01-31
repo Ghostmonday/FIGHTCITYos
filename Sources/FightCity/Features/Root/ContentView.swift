@@ -2,11 +2,14 @@
 //  ContentView.swift
 //  FightCity
 //
-//  Root content view with navigation
+//  Root content view - Premium iOS experience
+//  Apple Design Award quality navigation and home screen
 //
 
 import SwiftUI
 import FightCityiOS
+
+// MARK: - Content View
 
 public struct ContentView: View {
     @EnvironmentObject private var coordinator: AppCoordinator
@@ -20,149 +23,375 @@ public struct ContentView: View {
                 if shouldShowOnboarding {
                     OnboardingView()
                 } else {
-                    mainTabView
+                    MainTabView()
                 }
             }
             .navigationDestination(for: NavigationDestination.self) { destination in
-                navigationDestination(for: destination)
+                destinationView(for: destination)
             }
             .sheet(isPresented: $coordinator.isShowingSheet) {
                 if let sheet = coordinator.selectedSheet {
-                    sheetDestination(sheet)
+                    sheetView(for: sheet)
                 }
             }
         }
+        .preferredColorScheme(.dark)
     }
     
     private var shouldShowOnboarding: Bool {
         !UserDefaults.standard.bool(forKey: "hasCompletedOnboarding")
     }
     
-    private var mainTabView: some View {
-        TabView {
-            HomeView()
-                .tabItem {
-                    Label("Home", systemImage: "house.fill")
-                }
-            
-            HistoryView()
-                .tabItem {
-                    Label("History", systemImage: "clock.fill")
-                }
-            
-            SettingsView()
-                .tabItem {
-                    Label("Settings", systemImage: "gearshape.fill")
-                }
-        }
-    }
-    
     @ViewBuilder
-    private func navigationDestination(for destination: NavigationDestination) -> some View {
+    private func destinationView(for destination: NavigationDestination) -> some View {
         switch destination {
         case .onboarding:
             OnboardingView()
-            
         case .capture:
             CaptureView()
-            
         case .confirmation(let result):
-            // TODO: PHASE 1, TASK 1.5 - Fix ConfirmationView initialization
-            // Current issue: ConfirmationView(result:) doesn't match actual init signature
-            // ConfirmationView requires init(result:onConfirm:onEdit:onRetake:)
-            //
-            // Fix:
-ConfirmationView(
+            ConfirmationView(
                 captureResult: result,
                 onConfirm: { result in
-                    // Save to history
-                    // Navigate to next step
+                    coordinator.navigateToRoot()
                 },
                 onRetake: {
-                    // Clear result and return to capture
+                    coordinator.navigateBack()
                 },
-                onEdit: { citationNumber in
-                    // Show edit sheet
-                }
+                onEdit: { _ in }
             )
-            
         case .history:
             HistoryView()
-            
         case .settings:
             SettingsView()
         }
     }
     
     @ViewBuilder
-    private func sheetDestination(_ sheet: AppCoordinator.SheetDestination) -> some View {
+    private func sheetView(for sheet: AppCoordinator.SheetDestination) -> some View {
         switch sheet {
         case .citySelection:
             CitySelectionSheet()
-            
         case .telemetryOptIn:
             TelemetryOptInSheet()
-            
         case .editCitation(let result):
             EditCitationSheet(result: result)
         }
     }
 }
 
-// MARK: - Home View
+// MARK: - Main Tab View
+
+struct MainTabView: View {
+    @State private var selectedTab = 0
+    
+    var body: some View {
+        TabView(selection: $selectedTab) {
+            HomeView()
+                .tabItem {
+                    Image(systemName: selectedTab == 0 ? "house.fill" : "house")
+                    Text("Home")
+                }
+                .tag(0)
+            
+            HistoryView()
+                .tabItem {
+                    Image(systemName: selectedTab == 1 ? "clock.fill" : "clock")
+                    Text("History")
+                }
+                .tag(1)
+            
+            SettingsView()
+                .tabItem {
+                    Image(systemName: selectedTab == 2 ? "gearshape.fill" : "gearshape")
+                    Text("Settings")
+                }
+                .tag(2)
+        }
+        .tint(AppColors.gold)
+        .onAppear {
+            // Premium tab bar styling
+            let appearance = UITabBarAppearance()
+            appearance.configureWithOpaqueBackground()
+            appearance.backgroundColor = UIColor(AppColors.surface)
+            appearance.stackedLayoutAppearance.selected.iconColor = UIColor(AppColors.gold)
+            appearance.stackedLayoutAppearance.selected.titleTextAttributes = [.foregroundColor: UIColor(AppColors.gold)]
+            appearance.stackedLayoutAppearance.normal.iconColor = UIColor(AppColors.textTertiary)
+            appearance.stackedLayoutAppearance.normal.titleTextAttributes = [.foregroundColor: UIColor(AppColors.textTertiary)]
+            UITabBar.appearance().standardAppearance = appearance
+            UITabBar.appearance().scrollEdgeAppearance = appearance
+        }
+    }
+}
+
+// MARK: - Home View (Hero Screen)
 
 struct HomeView: View {
     @EnvironmentObject private var coordinator: AppCoordinator
+    @State private var hasAppeared = false
+    @State private var pulseAnimation = false
     
     var body: some View {
-        NavigationStack {
-            VStack(spacing: 24) {
-                // Header
-                VStack(spacing: 8) {
-                    Text("FightCity")
-                        .font(AppTypography.headlineLarge)
+        ZStack {
+            // Background
+            AppColors.background
+                .ignoresSafeArea()
+            
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 0) {
+                    // Hero section
+                    heroSection
                     
-                    Text("Scan and contest parking tickets")
-                        .font(AppTypography.bodyMedium)
-                        .foregroundColor(.secondary)
-                }
-                .padding(.top, 32)
-                
-                Spacer()
-                
-                // Main action
-                Button(action: {
-                    coordinator.startCaptureFlow()
-                }) {
-                    VStack(spacing: 16) {
-                        Image(systemName: "camera.viewfinder")
-                            .font(.system(size: 64))
-                        
-                        Text("Scan Ticket")
-                            .font(AppTypography.titleLarge)
-                    }
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 48)
-                    .background(Color.accentColor)
-                    .foregroundColor(.white)
-                    .cornerRadius(16)
-                }
-                .padding(.horizontal, 24)
-                
-                Spacer()
-            }
-            .navigationTitle("Home")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button(action: {
-                        coordinator.showSheet(.citySelection)
-                    }) {
-                        Image(systemName: "location.fill")
-                    }
+                    // Quick actions
+                    quickActionsSection
+                        .padding(.top, 24)
+                    
+                    // Recent activity
+                    recentActivitySection
+                        .padding(.top, 32)
+                    
+                    Spacer(minLength: 100)
                 }
             }
         }
+        .navigationBarHidden(true)
+        .onAppear {
+            FCHaptics.prepare()
+            withAnimation(.easeOut(duration: 0.6)) {
+                hasAppeared = true
+            }
+            // Start pulse animation
+            withAnimation(.easeInOut(duration: 2.0).repeatForever(autoreverses: true)) {
+                pulseAnimation = true
+            }
+        }
+    }
+    
+    // MARK: - Hero Section
+    
+    private var heroSection: some View {
+        VStack(spacing: 24) {
+            // Header
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("FIGHTCITY")
+                        .font(.system(size: 28, weight: .black, design: .rounded))
+                        .tracking(2)
+                        .foregroundColor(.white)
+                    
+                    HStack(spacing: 6) {
+                        Image(systemName: "sparkles")
+                            .font(.system(size: 12))
+                        Text("Powered by Apple Intelligence")
+                            .font(.system(size: 12, weight: .medium))
+                    }
+                    .foregroundColor(AppColors.gold)
+                }
+                
+                Spacer()
+                
+                // Settings button
+                Button(action: {
+                    FCHaptics.lightImpact()
+                    coordinator.navigateTo(.settings)
+                }) {
+                    Image(systemName: "gearshape.fill")
+                        .font(.system(size: 20))
+                        .foregroundColor(AppColors.textSecondary)
+                        .frame(width: 44, height: 44)
+                        .background(AppColors.glass)
+                        .cornerRadius(12)
+                }
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 60)
+            
+            // Hero scan button
+            Button(action: {
+                FCHaptics.heavyImpact()
+                coordinator.startCaptureFlow()
+            }) {
+                ZStack {
+                    // Glow effect
+                    Circle()
+                        .fill(AppColors.gold.opacity(0.15))
+                        .frame(width: 220, height: 220)
+                        .scaleEffect(pulseAnimation ? 1.1 : 1.0)
+                    
+                    Circle()
+                        .fill(AppColors.gold.opacity(0.1))
+                        .frame(width: 180, height: 180)
+                        .scaleEffect(pulseAnimation ? 1.15 : 1.0)
+                    
+                    // Main button
+                    VStack(spacing: 12) {
+                        Image(systemName: "viewfinder")
+                            .font(.system(size: 48, weight: .light))
+                            .foregroundColor(AppColors.gold)
+                        
+                        Text("Scan Ticket")
+                            .font(.system(size: 18, weight: .semibold))
+                            .foregroundColor(.white)
+                    }
+                    .frame(width: 160, height: 160)
+                    .background(
+                        Circle()
+                            .fill(AppColors.surface)
+                            .overlay(
+                                Circle()
+                                    .stroke(AppColors.gold.opacity(0.3), lineWidth: 2)
+                            )
+                    )
+                    .shadow(color: AppColors.gold.opacity(0.3), radius: 20, y: 10)
+                }
+            }
+            .scaleEffect(hasAppeared ? 1.0 : 0.8)
+            .opacity(hasAppeared ? 1.0 : 0)
+            .animation(.spring(response: 0.6, dampingFraction: 0.7).delay(0.1), value: hasAppeared)
+            .padding(.vertical, 20)
+            .accessibilityLabel("Scan Ticket")
+            .accessibilityHint("Opens camera to scan a parking ticket")
+        }
+    }
+    
+    // MARK: - Quick Actions
+    
+    private var quickActionsSection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            Text("Quick Actions")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundColor(AppColors.textTertiary)
+                .textCase(.uppercase)
+                .tracking(1)
+                .padding(.horizontal, 20)
+            
+            HStack(spacing: 12) {
+                // Manual entry
+                QuickActionCard(
+                    icon: "keyboard",
+                    title: "Manual Entry",
+                    subtitle: "Type citation #"
+                ) {
+                    FCHaptics.lightImpact()
+                    // Show manual entry
+                }
+                
+                // View history
+                QuickActionCard(
+                    icon: "clock.arrow.circlepath",
+                    title: "History",
+                    subtitle: "Past tickets"
+                ) {
+                    FCHaptics.lightImpact()
+                    coordinator.navigateTo(.history)
+                }
+            }
+            .padding(.horizontal, 20)
+        }
+        .opacity(hasAppeared ? 1.0 : 0)
+        .offset(y: hasAppeared ? 0 : 20)
+        .animation(.easeOut(duration: 0.5).delay(0.3), value: hasAppeared)
+    }
+    
+    // MARK: - Recent Activity
+    
+    private var recentActivitySection: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Recent Activity")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundColor(AppColors.textTertiary)
+                    .textCase(.uppercase)
+                    .tracking(1)
+                
+                Spacer()
+                
+                Button(action: {
+                    coordinator.navigateTo(.history)
+                }) {
+                    Text("See All")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundColor(AppColors.gold)
+                }
+            }
+            .padding(.horizontal, 20)
+            
+            // Empty state or recent items
+            VStack(spacing: 12) {
+                EmptyActivityCard()
+            }
+            .padding(.horizontal, 20)
+        }
+        .opacity(hasAppeared ? 1.0 : 0)
+        .offset(y: hasAppeared ? 0 : 20)
+        .animation(.easeOut(duration: 0.5).delay(0.4), value: hasAppeared)
+    }
+}
+
+// MARK: - Quick Action Card
+
+struct QuickActionCard: View {
+    let icon: String
+    let title: String
+    let subtitle: String
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: action) {
+            VStack(alignment: .leading, spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 24))
+                    .foregroundColor(AppColors.gold)
+                
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundColor(.white)
+                    
+                    Text(subtitle)
+                        .font(.system(size: 13))
+                        .foregroundColor(AppColors.textTertiary)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(16)
+            .background(AppColors.surface)
+            .cornerRadius(16)
+            .overlay(
+                RoundedRectangle(cornerRadius: 16)
+                    .stroke(AppColors.glassBorder, lineWidth: 1)
+            )
+        }
+    }
+}
+
+// MARK: - Empty Activity Card
+
+struct EmptyActivityCard: View {
+    var body: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "tray")
+                .font(.system(size: 32))
+                .foregroundColor(AppColors.textTertiary)
+            
+            VStack(spacing: 4) {
+                Text("No tickets yet")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundColor(AppColors.textSecondary)
+                
+                Text("Scan your first ticket to get started")
+                    .font(.system(size: 14))
+                    .foregroundColor(AppColors.textTertiary)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(32)
+        .background(AppColors.surface)
+        .cornerRadius(16)
+        .overlay(
+            RoundedRectangle(cornerRadius: 16)
+                .stroke(AppColors.glassBorder, lineWidth: 1)
+        )
     }
 }
 
@@ -176,26 +405,29 @@ struct CitySelectionSheet: View {
         NavigationStack {
             List(config.supportedCities) { city in
                 Button(action: {
-                    // Select city
+                    FCHaptics.selection()
                     dismiss()
                 }) {
                     HStack {
-                        VStack(alignment: .leading) {
+                        VStack(alignment: .leading, spacing: 4) {
                             Text(city.name)
-                                .font(AppTypography.titleMedium)
+                                .font(.system(size: 17, weight: .medium))
+                                .foregroundColor(.white)
                             Text(city.state)
-                                .font(AppTypography.bodySmall)
-                                .foregroundColor(.secondary)
+                                .font(.system(size: 14))
+                                .foregroundColor(AppColors.textSecondary)
                         }
-                        
                         Spacer()
-                        
                         Image(systemName: "chevron.right")
-                            .foregroundColor(.secondary)
+                            .font(.system(size: 14, weight: .medium))
+                            .foregroundColor(AppColors.textTertiary)
                     }
+                    .padding(.vertical, 4)
                 }
-                .foregroundColor(.primary)
             }
+            .listStyle(.plain)
+            .scrollContentBackground(.hidden)
+            .background(AppColors.background)
             .navigationTitle("Select City")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -203,10 +435,12 @@ struct CitySelectionSheet: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundColor(AppColors.gold)
                 }
             }
         }
         .presentationDetents([.medium, .large])
+        .presentationDragIndicator(.visible)
     }
 }
 
@@ -218,46 +452,69 @@ struct TelemetryOptInSheet: View {
     
     var body: some View {
         NavigationStack {
-            VStack(spacing: 24) {
+            VStack(spacing: 32) {
+                Spacer()
+                
                 Image(systemName: "chart.bar.fill")
-                    .font(.system(size: 48))
-                    .foregroundColor(.accentColor)
+                    .font(.system(size: 56))
+                    .foregroundColor(AppColors.gold)
                 
-                Text("Help Improve OCR")
-                    .font(AppTypography.titleLarge)
-                
-                Text("Share anonymous usage data to help us improve text recognition accuracy.")
-                    .font(AppTypography.bodyMedium)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
+                VStack(spacing: 12) {
+                    Text("Improve Recognition")
+                        .font(.system(size: 24, weight: .bold))
+                        .foregroundColor(.white)
+                    
+                    Text("Share anonymous usage data to help us improve text recognition accuracy for everyone.")
+                        .font(.system(size: 16))
+                        .foregroundColor(AppColors.textSecondary)
+                        .multilineTextAlignment(.center)
+                        .padding(.horizontal, 24)
+                }
                 
                 Spacer()
                 
                 VStack(spacing: 12) {
-                    PrimaryButton(title: "Enable Telemetry", action: {
+                    Button(action: {
+                        FCHaptics.success()
                         config.setTelemetryEnabled(true)
                         dismiss()
-                    })
+                    }) {
+                        Text("Enable")
+                            .font(.system(size: 17, weight: .semibold))
+                            .foregroundColor(AppColors.obsidian)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                            .background(AppColors.goldGradient)
+                            .cornerRadius(14)
+                    }
                     
-                    SecondaryButton(title: "Not Now", action: {
+                    Button(action: {
+                        FCHaptics.lightImpact()
                         dismiss()
-                    })
+                    }) {
+                        Text("Not Now")
+                            .font(.system(size: 17, weight: .medium))
+                            .foregroundColor(AppColors.textSecondary)
+                            .frame(maxWidth: .infinity)
+                            .frame(height: 56)
+                    }
                 }
                 .padding(.horizontal, 24)
+                .padding(.bottom, 32)
             }
-            .padding(.vertical, 32)
-            .navigationTitle("Telemetry")
+            .background(AppColors.background)
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button("Skip") {
                         dismiss()
                     }
+                    .foregroundColor(AppColors.textSecondary)
                 }
             }
         }
         .presentationDetents([.medium])
+        .presentationDragIndicator(.visible)
     }
 }
 
@@ -270,26 +527,58 @@ struct EditCitationSheet: View {
     
     var body: some View {
         NavigationStack {
-            Form {
-                Section("Detected Citation") {
-                    Text(result.extractedCitationNumber ?? "Not found")
-                        .font(AppTypography.citationNumber)
+            VStack(spacing: 24) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Current")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(AppColors.textTertiary)
+                        .textCase(.uppercase)
+                    
+                    Text(result.extractedCitationNumber ?? "Not detected")
+                        .font(.system(size: 20, weight: .mono(.bold)))
+                        .foregroundColor(AppColors.textSecondary)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(16)
+                .background(AppColors.surface)
+                .cornerRadius(12)
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Edit Citation Number")
+                        .font(.system(size: 13, weight: .medium))
+                        .foregroundColor(AppColors.textTertiary)
+                        .textCase(.uppercase)
+                    
+                    TextField("", text: $editedCitation)
+                        .font(.system(size: 24, weight: .bold, design: .monospaced))
+                        .foregroundColor(.white)
+                        .textInputAutocapitalization(.characters)
+                        .padding(16)
+                        .background(AppColors.surface)
+                        .cornerRadius(12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 12)
+                                .stroke(AppColors.gold.opacity(0.5), lineWidth: 2)
+                        )
                 }
                 
-                Section("Edit Citation Number") {
-                    TextField("Citation Number", text: $editedCitation)
-                        .font(AppTypography.citationNumber)
-                }
+                Spacer()
                 
-                Section {
-                    Button(action: {
-                        // Save edited citation
-                        dismiss()
-                    }) {
-                        Text("Save Changes")
-                    }
+                Button(action: {
+                    FCHaptics.success()
+                    dismiss()
+                }) {
+                    Text("Save Changes")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundColor(AppColors.obsidian)
+                        .frame(maxWidth: .infinity)
+                        .frame(height: 56)
+                        .background(AppColors.goldGradient)
+                        .cornerRadius(14)
                 }
             }
+            .padding(24)
+            .background(AppColors.background)
             .navigationTitle("Edit Citation")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
@@ -297,6 +586,7 @@ struct EditCitationSheet: View {
                     Button("Cancel") {
                         dismiss()
                     }
+                    .foregroundColor(AppColors.gold)
                 }
             }
         }
@@ -311,61 +601,144 @@ struct EditCitationSheet: View {
 struct SettingsView: View {
     @EnvironmentObject private var config: AppConfig
     @EnvironmentObject private var coordinator: AppCoordinator
+    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        NavigationStack {
-            Form {
-                Section("Telemetry") {
-                    Toggle("Enable Telemetry", isOn: $config.telemetryEnabled)
-                    
-                    if config.telemetryEnabled {
-                        Button("Upload Pending Data") {
-                            Task {
-                                await TelemetryService.shared.uploadPending()
-                            }
-                        }
+        List {
+            // App section
+            Section {
+                SettingsRow(icon: "location.fill", title: "City", value: "Auto-detect") {
+                    coordinator.showSheet(.citySelection)
+                }
+            } header: {
+                Text("App")
+            }
+            
+            // Privacy section
+            Section {
+                Toggle(isOn: $config.telemetryEnabled) {
+                    HStack(spacing: 12) {
+                        Image(systemName: "chart.bar.fill")
+                            .font(.system(size: 18))
+                            .foregroundColor(AppColors.gold)
+                            .frame(width: 28)
+                        
+                        Text("Improve Recognition")
+                            .font(.system(size: 17))
+                            .foregroundColor(.white)
                     }
                 }
+                .tint(AppColors.gold)
+            } header: {
+                Text("Privacy")
+            } footer: {
+                Text("Help improve text recognition by sharing anonymous usage data.")
+            }
+            
+            // About section
+            Section {
+                HStack {
+                    Text("Version")
+                        .foregroundColor(.white)
+                    Spacer()
+                    Text("1.0.0")
+                        .foregroundColor(AppColors.textSecondary)
+                }
                 
-                Section("About") {
+                Link(destination: URL(string: "https://fightcity.app/privacy")!) {
                     HStack {
-                        Text("Version")
+                        Text("Privacy Policy")
+                            .foregroundColor(.white)
                         Spacer()
-                        Text("1.0.0")
-                            .foregroundColor(.secondary)
+                        Image(systemName: "arrow.up.right")
+                            .font(.system(size: 14))
+                            .foregroundColor(AppColors.textTertiary)
                     }
-                    
-                    Link("Privacy Policy", destination: URL(string: "https://fightcitytickets.com/privacy")!)
-                    
-                    Link("Terms of Service", destination: URL(string: "https://fightcitytickets.com/terms")!)
                 }
                 
-                Section("Debug") {
-                    Button("Reset Onboarding") {
-                        UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
+                Link(destination: URL(string: "https://fightcity.app/terms")!) {
+                    HStack {
+                        Text("Terms of Service")
+                            .foregroundColor(.white)
+                        Spacer()
+                        Image(systemName: "arrow.up.right")
+                            .font(.system(size: 14))
+                            .foregroundColor(AppColors.textTertiary)
                     }
-                    
-                    Button("Clear Caches") {
-                        // Clear caches
-                    }
+                }
+            } header: {
+                Text("About")
+            }
+            
+            #if DEBUG
+            // Debug section
+            Section {
+                Button(action: {
+                    UserDefaults.standard.set(false, forKey: "hasCompletedOnboarding")
+                    FCHaptics.warning()
+                }) {
+                    Text("Reset Onboarding")
+                        .foregroundColor(AppColors.warning)
+                }
+            } header: {
+                Text("Debug")
+            }
+            #endif
+        }
+        .listStyle(.insetGrouped)
+        .scrollContentBackground(.hidden)
+        .background(AppColors.background)
+        .navigationTitle("Settings")
+        .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarLeading) {
+                Button(action: { dismiss() }) {
+                    Image(systemName: "xmark")
+                        .foregroundColor(AppColors.textSecondary)
                 }
             }
-            .navigationTitle("Settings")
+        }
+    }
+}
+
+// MARK: - Settings Row
+
+struct SettingsRow: View {
+    let icon: String
+    let title: String
+    let value: String
+    let action: () -> Void
+    
+    var body: some View {
+        Button(action: {
+            FCHaptics.lightImpact()
+            action()
+        }) {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 18))
+                    .foregroundColor(AppColors.gold)
+                    .frame(width: 28)
+                
+                Text(title)
+                    .font(.system(size: 17))
+                    .foregroundColor(.white)
+                
+                Spacer()
+                
+                Text(value)
+                    .font(.system(size: 15))
+                    .foregroundColor(AppColors.textSecondary)
+                
+                Image(systemName: "chevron.right")
+                    .font(.system(size: 14, weight: .medium))
+                    .foregroundColor(AppColors.textTertiary)
+            }
         }
     }
 }
 
 // MARK: - Previews
-
-// TODO: PHASE 3 - Create Appeal Flow Files (currently missing)
-// Required files:
-// - Sources/FightCity/Features/Appeal/AppealEntryView.swift
-// - Sources/FightCity/Features/Appeal/AppealViewModel.swift
-// - Sources/FightCity/Features/Appeal/EvidencePickerView.swift
-// - Sources/FightCityFoundation/Models/Appeal.swift
-// - Sources/FightCityFoundation/Networking/AppealAPI.swift
-//
-// Appeal flow: Confirmation → AppealEntry → Submit → Status tracking in History
 
 #if DEBUG
 struct ContentView_Previews: PreviewProvider {
