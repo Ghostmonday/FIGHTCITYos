@@ -16,6 +16,9 @@ struct CertifiedMailConfirmationSheet: View {
     @State var showingAddressForm = false
     @State var isProcessing = false
     @State var errorMessage: String?
+    @State var showSuccessView = false
+    @State var trackingNumber: String?
+    @State var expectedDeliveryDate: String?
     @Environment(\.dismiss) var dismiss
     
     var body: some View {
@@ -165,6 +168,25 @@ struct CertifiedMailConfirmationSheet: View {
         .sheet(isPresented: $showingAddressForm) {
             AddressFormSheet(address: $userAddress)
         }
+        .fullScreenCover(isPresented: $showSuccessView) {
+            if let trackingNumber = trackingNumber {
+                MailSuccessView(
+                    trackingNumber: trackingNumber,
+                    expectedDeliveryDate: expectedDeliveryDate,
+                    citationId: citation.id.uuidString,
+                    onTrackMail: {
+                        showSuccessView = false
+                        dismiss()
+                        // Navigate to citation detail view would happen here
+                        // For now, just dismiss and let user navigate from history
+                    },
+                    onDone: {
+                        showSuccessView = false
+                        dismiss()
+                    }
+                )
+            }
+        }
     }
     
     private func sendCertifiedMail() {
@@ -215,11 +237,12 @@ struct CertifiedMailConfirmationSheet: View {
                     letterId: response.id
                 )
                 
-                // Show success
+                // Show success view
                 await MainActor.run {
                     isProcessing = false
-                    dismiss()
-                    // TODO: Navigate to confirmation view with tracking number
+                    trackingNumber = response.trackingNumber
+                    expectedDeliveryDate = response.expectedDeliveryDate
+                    showSuccessView = true
                 }
             } catch {
                 await MainActor.run {

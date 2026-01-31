@@ -123,14 +123,13 @@ public struct HistoryView: View {
         ScrollView(showsIndicators: false) {
             LazyVStack(spacing: 12) {
                 ForEach(filteredCitations) { citation in
-                    CitationCard(citation: citation)
-                        .onTapGesture {
-                            FCHaptics.lightImpact()
-                            // Navigate to detail
-                        }
-                        .opacity(hasAppeared ? 1 : 0)
-                        .offset(y: hasAppeared ? 0 : 20)
-                        .animation(.easeOut(duration: 0.4).delay(Double(filteredCitations.firstIndex(where: { $0.id == citation.id }) ?? 0) * 0.05), value: hasAppeared)
+                    NavigationLink(destination: CitationDetailView(citation: citation)) {
+                        CitationCard(citation: citation)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .opacity(hasAppeared ? 1 : 0)
+                    .offset(y: hasAppeared ? 0 : 20)
+                    .animation(.easeOut(duration: 0.4).delay(Double(filteredCitations.firstIndex(where: { $0.id == citation.id }) ?? 0) * 0.05), value: hasAppeared)
                 }
             }
             .padding(.horizontal, 20)

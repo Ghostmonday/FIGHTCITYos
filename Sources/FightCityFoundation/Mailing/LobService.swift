@@ -62,49 +62,8 @@ public struct LobAddress: Codable, Equatable {
     }
 }
 
-// MARK: - Lob Letter Response
-
-/// Response from Lob API when creating a certified mail letter
-/// ⚠️ Structure TBD based on actual Lob API documentation
-public struct LobLetterResponse: Codable {
-    public let id: String
-    public let description: String
-    public let url: String?
-    public let to: LobAddress
-    public let from: LobAddress
-    public let expectedDeliveryDate: String?
-    public let trackingNumber: String? // Verify field name from docs
-    public let trackingEvents: [LobTrackingEvent]? // Verify structure from docs
-    public let thumbnails: [LobThumbnail]?
-    
-    // TODO: Add any additional fields from actual API response once docs provided
-    
-    enum CodingKeys: String, CodingKey {
-        case id
-        case description
-        case url
-        case to
-        case from
-        case expectedDeliveryDate = "expected_delivery_date"
-        case trackingNumber = "tracking_number"
-        case trackingEvents = "tracking_events"
-        case thumbnails
-    }
-}
-
-public struct LobTrackingEvent: Codable {
-    public let name: String
-    public let date: String
-    public let location: String?
-}
-
-public struct LobThumbnail: Codable {
-    public let small: String?
-    public let medium: String?
-    public let large: String?
-}
-
 // MARK: - Lob Service
+// Note: LobLetterResponse, LobTrackingEvent, and LobThumbnail are defined in LobModels.swift
 
 /// Lob API service for sending CERTIFIED MAIL ONLY letters via backend proxy
 ///
