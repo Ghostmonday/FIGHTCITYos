@@ -606,6 +606,31 @@ public struct OCRParsingEngine {
     
     // MARK: - Parsing
     
+    // APPLE INTELLIGENCE TODO: Add Core ML classifier BEFORE regex parsing
+    // Current flow: rawText → regex patterns → confidence scoring
+    // Target flow: rawText → ML classifier → high confidence? use ML : fallback to regex
+    //
+    // Implementation:
+    // 1. Create CoreML model with CreateML using citation training data
+    // 2. Model inputs: raw OCR text (String)
+    // 3. Model outputs: cityId (String), citationNumber (String), confidence (Double)
+    // 4. Use MLModel prediction:
+    //    if mlConfidence > 0.85 { return mlResult }
+    //    else { fallback to current regex logic }
+    //
+    // Pseudo-code:
+    // if FeatureFlags.mlClassification, let model = CitationClassifier.shared {
+    //     let prediction = try? model.prediction(text: rawText)
+    //     if prediction.confidence > 0.85 {
+    //         return ParsedCitation(
+    //             citationNumber: prediction.citationNumber,
+    //             cityId: prediction.cityId,
+    //             confidence: prediction.confidence
+    //         )
+    //     }
+    // }
+    // // Fallback to regex below...
+    
     /// Parse OCR text for citation numbers
     public func parse(_ text: String) -> ParsingResult {
         let normalizedText = normalizeText(text)

@@ -113,6 +113,7 @@ public final class KeychainService {
         // Add new item
         let status = SecItemAdd(query as CFDictionary, nil)
         if status != errSecSuccess {
+            // TODO: Replace with Logger.shared.error("Keychain save failed with status: \(status)")
             print("Keychain save error: \(status)")
         }
     }

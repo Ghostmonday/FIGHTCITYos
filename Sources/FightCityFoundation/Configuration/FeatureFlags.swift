@@ -193,6 +193,8 @@ public struct FeatureFlags {
     // MARK: - Debug and Testing Support
     
     /// Print current feature flag status (for debugging)
+    // TODO: Replace all print() in printCurrentStatus() with Logger calls
+    // Or keep as debug-only print since it's explicitly a debug function
     public static func printCurrentStatus() {
         print("=== Apple Intelligence Feature Flags Status ===")
         print("VisionKit Document Scanner: \(visionKitDocumentScanner)")

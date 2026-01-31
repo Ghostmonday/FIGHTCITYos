@@ -1,3 +1,8 @@
+// FIXME: REDUNDANT - This file is unnecessary for SwiftUI @main apps.
+// DELETE THIS FILE - FightCityApp.swift already handles app lifecycle.
+// SceneDelegate is only needed for UIKit-based apps or specific scene management.
+// Decision: Remove this file entirely or comment out all code.
+
 //
 //  SceneDelegate.swift
 //  FightCity

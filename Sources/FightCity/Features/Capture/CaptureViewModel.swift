@@ -16,6 +16,18 @@ import FightCityFoundation
 /// APPLE INTELLIGENCE: Route OCR text through Core ML classifier prior to regex
 /// APPLE INTELLIGENCE: Enable dictation UI for appeal writing
 
+// APPLE INTELLIGENCE TODO: This ViewModel needs Apple Intelligence integration
+// Current state: Uses Vision OCR + preprocessing
+// Target state: VisionKit Document Scanner → Live Text → Core ML classifier → Regex fallback
+//
+// PHASE 1 Tasks:
+// - Task 1.2: Integrate VisionKit Document Scanner as primary capture method
+// - Task 1.3: Use Live Text (VisionKit.ImageAnalyzer) for OCR instead of Vision framework
+// - Task 1.4: Add Core ML citation classifier (train with CreateML)
+//
+// Current flow: capturePhoto() → processImage() → OCREngine.recognize() → OCRParsingEngine.parse()
+// Target flow: captureWithDocumentScanner() → LiveText.analyze() → MLClassifier.predict() → fallback to regex
+
 @MainActor
 public final class CaptureViewModel: ObservableObject, DocumentScanCoordinatorDelegate {
     // MARK: - Published State
@@ -118,8 +130,10 @@ public final class CaptureViewModel: ObservableObject, DocumentScanCoordinatorDe
         )
         
         if usedDocumentScanner {
+            // TODO: Replace with Logger.shared.info("Using VisionKit Document Scanner")
             print("Using VisionKit Document Scanner")
         } else {
+            // TODO: Replace with Logger.shared.info("Using traditional camera as fallback")
             print("Using traditional camera as fallback")
         }
     }
@@ -224,6 +238,7 @@ public final class CaptureViewModel: ObservableObject, DocumentScanCoordinatorDe
             processedImage = try await preprocessor.preprocess(image)
         } catch {
             // Log preprocessing error but continue with original image
+            // TODO: Replace with Logger.shared.warning("Image preprocessing failed", error: error)
             print("Warning: Image preprocessing failed: \(error.localizedDescription)")
             processedImage = image
         }
