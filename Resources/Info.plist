@@ -21,7 +21,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>1.0.0</string>
 	<key>CFBundleSupportedPlatforms</key>
 	<array>
 		<string>iPhoneOS</string>
@@ -33,11 +33,17 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>FightCityTickets needs camera access to scan parking ticket citation numbers.</string>
+	<string>FightCityTickets needs camera access to scan parking ticket citation numbers using Apple Intelligence OCR.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>FightCityTickets uses your location to verify parking ticket locations and provide context for appeals using MapKit Look Around.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>FightCityTickets needs microphone access to record voice appeals using Apple Intelligence speech recognition.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>FightCityTickets needs photo library access to save captured ticket images.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>FightCityTickets needs photo library access to import ticket photos.</string>
+	<string>FightCityTickets needs photo library access to import ticket photos for processing.</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>FightCityTickets uses speech recognition powered by Apple Intelligence to transcribe your voice appeals into text.</string>
 	<key>UIApplicationSceneManifest</key>
 	<dict>
 		<key>UIApplicationSupportsMultipleScenes</key>
@@ -52,10 +58,6 @@
 		<key>UIImageName</key>
 		<string></string>
 	</dict>
-	<key>UIRequiredDeviceCapabilities</key>
-	<array>
-		<string>armv7</string>
-	</array>
 	<key>UISupportedInterfaceOrientations</key>
 	<array>
 		<string>UIInterfaceOrientationPortrait</string>

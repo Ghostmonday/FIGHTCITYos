@@ -645,27 +645,27 @@ struct SettingsView: View {
                         .foregroundColor(AppColors.textSecondary)
                 }
                 
-                Link(destination: URL(string: "https://fightcity.app/privacy")!) {
-                    HStack {
-                        Text("Privacy Policy")
-                            .foregroundColor(.white)
-                        Spacer()
-                        Image(systemName: "arrow.up.right")
-                            .font(.system(size: 14))
-                            .foregroundColor(AppColors.textTertiary)
+                    Link(destination: URL(string: "https://fightcitytickets.com/privacy")!) {
+                        HStack {
+                            Text("Privacy Policy")
+                                .foregroundColor(.white)
+                            Spacer()
+                            Image(systemName: "arrow.up.right")
+                                .font(.system(size: 14))
+                                .foregroundColor(AppColors.textTertiary)
+                        }
                     }
-                }
-                
-                Link(destination: URL(string: "https://fightcity.app/terms")!) {
-                    HStack {
-                        Text("Terms of Service")
-                            .foregroundColor(.white)
-                        Spacer()
-                        Image(systemName: "arrow.up.right")
-                            .font(.system(size: 14))
-                            .foregroundColor(AppColors.textTertiary)
+                    
+                    Link(destination: URL(string: "https://fightcitytickets.com/terms")!) {
+                        HStack {
+                            Text("Terms of Service")
+                                .foregroundColor(.white)
+                            Spacer()
+                            Image(systemName: "arrow.up.right")
+                                .font(.system(size: 14))
+                                .foregroundColor(AppColors.textTertiary)
+                        }
                     }
-                }
             } header: {
                 Text("About")
             }
