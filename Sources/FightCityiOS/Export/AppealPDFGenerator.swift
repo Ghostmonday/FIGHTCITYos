@@ -55,6 +55,14 @@ public struct UserContactInfo {
 }
 
 /// PDF generator for appeal letters
+///
+/// APP STORE READINESS: PDF generation is critical for certified mail feature
+/// TODO APP STORE: Ensure PDF meets USPS and Lob specifications
+/// TODO ENHANCEMENT: Add customizable letterhead/branding options
+/// TODO ACCESSIBILITY: Ensure generated PDFs are accessible (tagged PDF)
+/// QUALITY: PDF must be print-ready at 300 DPI for professional appearance
+/// TESTING: Test PDF generation with various appeal lengths and edge cases
+/// COMPLIANCE: Ensure all required legal elements are present in letter
 public enum AppealPDFGenerator {
     /// Generates a print-ready PDF for an appeal letter
     ///

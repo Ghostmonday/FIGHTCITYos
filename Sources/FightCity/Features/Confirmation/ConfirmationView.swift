@@ -133,6 +133,10 @@ public struct ConfirmationView: View {
     
     // MARK: - Image Preview
     
+    // APP STORE READINESS: Image preview is critical for user confidence
+    // UI POLISH: Consider adding pinch-to-zoom gesture for detailed inspection
+    // TODO ENHANCEMENT: Add image editing capabilities (crop, rotate, brightness)
+    // ACCESSIBILITY: Add .accessibilityLabel describing the image content
     private var imagePreview: some View {
         Group {
             if let imageData = captureResult.croppedImageData ?? captureResult.originalImageData,
@@ -254,6 +258,11 @@ public struct ConfirmationView: View {
     
     // MARK: - Confidence Card
     
+    // APP STORE READINESS: Confidence indicator is key differentiator - must be accurate
+    // UI POLISH: The circular progress ring is visually appealing and intuitive
+    // APPLE INTELLIGENCE: This shows AI processing quality - critical for user trust
+    // TODO ENHANCEMENT: Add explanation button to educate users about confidence scores
+    // ACCESSIBILITY: Ensure color alone doesn't convey meaning - add text/icons
     private var confidenceCard: some View {
         VStack(alignment: .leading, spacing: 16) {
             Text("Recognition Confidence")
@@ -376,6 +385,11 @@ public struct ConfirmationView: View {
     
     // MARK: - Action Buttons
     
+    // APP STORE READINESS: Button hierarchy must be clear - primary action obvious
+    // UI POLISH: Golden gradient CTA stands out perfectly against dark theme
+    // ACCESSIBILITY: All buttons need proper labels and hints
+    // ERROR HANDLING: "Looks Good" should be disabled if citation number is invalid/empty
+    // TODO APP STORE: Add loading state when creating citation and navigating
     private var actionButtons: some View {
         VStack(spacing: 12) {
             // Primary CTA
@@ -500,6 +514,14 @@ public struct ConfirmationView: View {
     
     // MARK: - Citation Creation
     
+    // APP STORE READINESS: This is critical flow - must handle all edge cases
+    // ERROR HANDLING: Need try-catch for citation creation failures
+    // TODO APP STORE: Add validation before creating citation:
+    //   - Verify citation number format (length, characters)
+    //   - Check if citation already exists in local storage
+    //   - Validate city ID is recognized
+    // TODO PERFORMANCE: Consider debouncing rapid button taps
+    // TODO ANALYTICS: Track how many citations go through vs. retakes
     private func createCitationAndShowAppealEditor() {
         // Create Citation from CaptureResult
         let citation = Citation(

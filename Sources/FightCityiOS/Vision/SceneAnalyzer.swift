@@ -14,6 +14,14 @@ import os.log
 /// APPLE INTELLIGENCE: Vision-based scene analysis for parking sign and meter detection
 /// APPLE INTELLIGENCE: Uses VNClassifyImageRequest for object detection
 /// APPLE INTELLIGENCE: Real-time analysis of evidence photo content
+///
+/// APP STORE READINESS: Scene analysis adds professional evidence collection
+/// TODO APP STORE: Train custom Core ML model for parking sign recognition
+/// TODO ENHANCEMENT: Add MapKit Look Around integration for location context
+/// TODO ACCESSIBILITY: Provide VoiceOver descriptions of detected objects
+/// PERFORMANCE: Vision framework is GPU-accelerated but test on older devices
+/// ACCURACY: Require high confidence threshold (0.8+) for evidence photos
+/// NOTE: This feature differentiates app from basic ticket apps
 
 // MARK: - Scene Analysis Result
 

@@ -3,6 +3,14 @@
 // This coordinator handles VisionKit's VNDocumentCameraViewController
 // with automatic fallback to traditional camera on unsupported devices.
 //
+// APP STORE READINESS: Document scanner is premium iOS 16+ feature
+// APPLE INTELLIGENCE: VisionKit provides auto-cropping and enhancement
+// TODO APP STORE: Thoroughly test on all supported devices (iPhone 8+)
+// TODO ENHANCEMENT: Add custom UI overlay for citation-specific guidance
+// ACCESSIBILITY: VisionKit scanner has built-in accessibility support
+// PERFORMANCE: Scanner is GPU-accelerated by Apple, very efficient
+// FALLBACK: Always gracefully fall back to traditional camera on older devices
+//
 // Testing checklist:
 // - [ ] Test on device with iOS 16+ (Simulator doesn't support camera)
 // - [ ] Verify auto-cropping works

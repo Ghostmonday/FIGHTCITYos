@@ -10,6 +10,14 @@ import SwiftUI
 
 // MARK: - Onboarding View
 
+// APP STORE READINESS: First impressions matter - onboarding is critical!
+// UI POLISH: Current onboarding is beautiful with smooth animations
+// APPLE INTELLIGENCE: Highlight AI features prominently here
+// TODO APP STORE: Add skip button for returning users (iOS HIG guideline)
+// TODO ENHANCEMENT: Add interactive tutorials instead of static pages
+// TODO ANALYTICS: Track which pages users spend most time on
+// ACCESSIBILITY: Ensure all text is readable at all Dynamic Type sizes
+// PERFORMANCE: Preload all onboarding images to prevent stuttering
 public struct OnboardingView: View {
     @EnvironmentObject private var coordinator: AppCoordinator
     @State private var currentPage = 0

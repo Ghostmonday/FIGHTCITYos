@@ -93,6 +93,12 @@ public final class CaptureViewModel: ObservableObject, DocumentScanCoordinatorDe
     
     // MARK: - Capture
     
+    // APP STORE READINESS: Photo capture is core functionality - must be rock-solid
+    // ERROR HANDLING: All paths must have proper error messages for user
+    // PERFORMANCE: Image capture should complete within 2 seconds
+    // TODO APP STORE: Add user feedback during capture (shutter sound, visual flash)
+    // TODO ENHANCEMENT: Add burst mode for difficult-to-read tickets
+    // TODO ANALYTICS: Track success/failure rates to improve OCR algorithms
     public func capturePhoto() async {
         processingState = .capturing
         
@@ -123,6 +129,13 @@ public final class CaptureViewModel: ObservableObject, DocumentScanCoordinatorDe
     /// Capture using VisionKit Document Scanner with automatic fallback
     /// - Parameter viewController: The view controller to present the scanner from
     /// - Note: Requires iOS 16.0+
+    ///
+    /// APP STORE READINESS: Document Scanner provides superior UX for iOS 16+
+    /// APPLE INTELLIGENCE: VisionKit is Apple's recommended approach for document capture
+    /// UI POLISH: Auto-cropping and perspective correction wow users!
+    /// TODO APP STORE: Make this the primary capture method on iOS 16+ devices
+    /// TODO TESTING: Thoroughly test fallback to traditional camera on iOS 15
+    /// ACCESSIBILITY: VisionKit scanner has built-in accessibility support
     @available(iOS 16.0, *)
     public func captureWithDocumentScanner(from viewController: UIViewController) async {
         processingState = .capturing

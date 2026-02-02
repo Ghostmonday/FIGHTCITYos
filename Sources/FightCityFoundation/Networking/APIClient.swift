@@ -28,6 +28,15 @@ public struct DefaultAPIConfiguration: APIConfiguration {
 }
 
 /// API client with retry logic, timeout, and offline support
+///
+/// APP STORE READINESS: Network reliability is critical for user trust
+/// ERROR HANDLING: All network errors must show user-friendly messages
+/// TODO APP STORE: Implement certificate pinning for production (security)
+/// TODO ENHANCEMENT: Add request/response logging for debugging (dev only)
+/// TODO PERFORMANCE: Implement request caching for repeated API calls
+/// TODO ACCESSIBILITY: Ensure error messages are clear and actionable
+/// SECURITY: Never log sensitive data (auth tokens, citation numbers)
+/// OFFLINE SUPPORT: Queue requests when offline, sync when online
 public actor APIClient: APIClientProtocol {
     public static let shared = APIClient()
     

@@ -65,6 +65,12 @@ public struct HistoryView: View {
     
     // MARK: - Search Bar
     
+    // APP STORE READINESS: Search is essential for users with multiple citations
+    // UI POLISH: Search bar design matches iOS native apps perfectly
+    // TODO APP STORE: Implement actual search filtering of citations list
+    // TODO ENHANCEMENT: Add search history/suggestions
+    // ACCESSIBILITY: Search field needs .accessibilityLabel("Search your citations")
+    // PERFORMANCE: Debounce search input to avoid excessive filtering on every keystroke
     private var searchBar: some View {
         HStack(spacing: 12) {
             Image(systemName: "magnifyingglass")
@@ -96,6 +102,12 @@ public struct HistoryView: View {
     
     // MARK: - Filter Pills
     
+    // APP STORE READINESS: Filters make app feel professional and organized
+    // UI POLISH: Horizontal scroll with pills is iOS-standard pattern
+    // TODO APP STORE: Connect filters to actual data filtering logic
+    // TODO ENHANCEMENT: Add filter badge counts (e.g., "Active (3)")
+    // ACCESSIBILITY: Each filter pill needs proper accessibility labels
+    // PERFORMANCE: Ensure smooth scrolling on all devices
     private var filterPills: some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
