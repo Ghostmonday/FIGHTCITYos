@@ -13,6 +13,12 @@ import FightCityFoundation
 /// Premium button with haptic feedback and loading states
 /// TIP: Always use FCButton instead of SwiftUI Button for consistent UX
 /// The haptic feedback is built-in and makes interactions feel premium
+///
+/// APP STORE READINESS: This component is production-ready and follows iOS HIG
+/// UI POLISH: Haptic feedback creates premium feel - users notice this!
+/// ACCESSIBILITY: Consider adding .accessibilityAddTraits(.isButton) explicitly
+/// TODO ENHANCEMENT: Add icon positioning option (leading/trailing)
+/// TODO ACCESSIBILITY: Ensure disabled state is clear in VoiceOver
 public struct FCButton: View {
     public enum ButtonStyle {
         case primary
@@ -118,6 +124,12 @@ public struct FCButton: View {
 /// Premium glassmorphism card with subtle shadow
 /// TIP: Use FCCard instead of plain VStacks for content sections
 /// The shadow and rounded corners give depth and polish
+///
+/// APP STORE READINESS: Cards create visual hierarchy - essential for polish
+/// UI POLISH: Glassmorphism effect is subtle but makes UI feel modern
+/// ACCESSIBILITY: Cards should have clear contrast from background
+/// TODO ENHANCEMENT: Add hover state for pointer devices (iPad with trackpad)
+/// PERFORMANCE: Shadow rendering can be expensive - monitor on older devices
 public struct FCCard<Content: View>: View {
     private let content: Content
     private let hasPadding: Bool
@@ -309,6 +321,13 @@ public struct FCProgressRing: View {
 /// Skeleton loading shimmer effect
 /// TIP: Use this while loading data from APIs - much better than spinner
 /// Creates professional "loading state" that feels like a native app
+///
+/// APP STORE READINESS: Skeleton screens are App Store best practice
+/// UI POLISH: Users prefer skeleton loaders to spinners - feels faster!
+/// ACCESSIBILITY: Announce loading state to VoiceOver users
+/// TODO ACCESSIBILITY: Add .accessibilityElement(children: .ignore) to prevent reading shimmer
+/// TODO APP STORE: Use throughout app for any network/async operations
+/// PERFORMANCE: GPU-accelerated animation but test on iPhone SE
 public struct FCShimmer: View {
     private let isAnimating: Bool
     

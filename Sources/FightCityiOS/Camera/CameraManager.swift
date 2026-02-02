@@ -12,6 +12,14 @@ import FightCityFoundation
 
 /// APPLE INTELLIGENCE: Provide real-time frame guidance overlays via Live Text
 /// APPLE INTELLIGENCE: Integrate with DocumentScanCoordinator for intelligent capture
+///
+/// APP STORE READINESS: Camera is core feature - must work flawlessly
+/// PERFORMANCE: Camera preview must be 60fps for smooth user experience
+/// TODO APP STORE: Test on all iPhone models (SE, Pro, Pro Max)
+/// TODO ENHANCEMENT: Add HDR photo capture for difficult lighting
+/// TODO ACCESSIBILITY: Provide haptic/audio feedback when focus locked
+/// SECURITY: Ensure camera doesn't capture beyond session lifecycle
+/// BATTERY: Monitor power consumption during extended camera use
 
 /// Manages camera capture with full control over exposure, focus, torch, and stabilization
 public actor CameraManager: NSObject {

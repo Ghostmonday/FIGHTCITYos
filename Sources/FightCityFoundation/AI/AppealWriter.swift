@@ -13,6 +13,13 @@ import os.log
 /// APPLE INTELLIGENCE: NaturalLanguage-based appeal writer for tone and clarity improvements
 /// APPLE INTELLIGENCE: Sentiment analysis for appeal quality
 /// APPLE INTELLIGENCE: Grammar and style suggestions using on-device NLP
+///
+/// APP STORE READINESS: AI appeal writer is a key differentiating feature
+/// APPLE INTELLIGENCE: Showcase this prominently in App Store description
+/// TODO APP STORE: Verify all AI processing happens on-device (privacy requirement)
+/// TODO ENHANCEMENT: Add multilingual support using NaturalLanguage.dominantLanguage
+/// PERFORMANCE: NaturalLanguage framework is optimized but test on iPhone SE
+/// ACCESSIBILITY: Ensure generated appeals are clear and readable
 
 // MARK: - Appeal Generation Result
 
