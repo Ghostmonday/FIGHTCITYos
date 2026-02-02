@@ -11,6 +11,15 @@ import UIKit
 import FightCityFoundation
 
 /// Service for collecting and managing telemetry data (opt-in only)
+///
+/// APP STORE READINESS: Privacy-first telemetry is critical for App Store approval
+/// PRIVACY: All telemetry must be opt-in with clear disclosure
+/// TODO APP STORE: Update Privacy Manifest with telemetry data collection details
+/// TODO ENHANCEMENT: Add telemetry dashboard for developers to monitor app health
+/// TODO ANALYTICS: Use telemetry to improve OCR accuracy and user experience
+/// SECURITY: Hash images, never store actual photos (PII concern)
+/// COMPLIANCE: Ensure GDPR/CCPA compliance for all data collection
+/// NOTE: Telemetry helps improve app but user privacy comes first
 @MainActor
 public final class TelemetryService: ObservableObject {
     public static let shared = TelemetryService()

@@ -8,6 +8,15 @@
 import Foundation
 
 /// Offline queue item for pending operations
+///
+/// APP STORE READINESS: Offline support is essential for mobile apps
+/// USER EXPERIENCE: Users can work offline, operations sync when online
+/// TODO APP STORE: Add UI indicator showing pending offline operations
+/// TODO ENHANCEMENT: Add background sync using Background Tasks framework
+/// RELIABILITY: Never lose user data due to network issues
+/// PERSISTENCE: Queue survives app restarts (saved to disk)
+/// PERFORMANCE: Batch operations for efficiency when coming back online
+/// NOTE: This differentiates app from basic web-wrapper apps
 public struct QueueItem: Identifiable, Codable {
     public let id: UUID
     public let operation: QueuedOperation

@@ -8,6 +8,15 @@
 import Foundation
 
 /// Circuit breaker for resilient API calls with automatic recovery
+///
+/// APP STORE READINESS: Circuit breaker prevents cascade failures
+/// ERROR HANDLING: Protects app from repeatedly hitting failing services
+/// TODO APP STORE: Monitor circuit breaker trips to detect backend issues
+/// TODO ENHANCEMENT: Add telemetry/logging for circuit state changes
+/// RELIABILITY: Improves app resilience under adverse network conditions
+/// PERFORMANCE: Prevents wasted requests to known-failing services
+/// USER EXPERIENCE: Faster fallback when services are down
+/// NOTE: This is production-grade reliability pattern used by major apps
 public actor CircuitBreaker {
     public enum State {
         case closed    // Normal operation
