@@ -47,6 +47,8 @@ public final class TelemetryService: ObservableObject {
         // Return true if user accepts
         return await withCheckedContinuation { continuation in
             // In real implementation, this would show a dialog
+            // AUDIT: Present a real consent dialog (with data usage details) before enabling telemetry.
+            // App Store review expects explicit opt-in with a clear privacy explanation.
             continuation.resume(returning: false)
         }
     }
@@ -121,6 +123,8 @@ public final class TelemetryService: ObservableObject {
             lastUploadDate = Date()
         } catch {
             // TODO: Replace with Logger.shared.error("Telemetry upload failed", error: error)
+            // AUDIT: Telemetry uploads should avoid print() in release builds; replace with Logger to keep
+            // logs centralized and privacy-aware. Also consider retry/backoff visibility for App Store support.
             print("Telemetry upload failed: \(error)")
         }
     }

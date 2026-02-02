@@ -26,6 +26,8 @@ public final class AppConfig: ObservableObject {
     // 3. Configure HTTPS with valid certificate
     // 4. Update this URL to actual deployed endpoint
     // 5. Test all APIEndpoints from iOS app
+    // AUDIT: For App Store review, ensure these URLs point to production services. Avoid localhost in
+    // release builds and document a staging configuration to prevent misrouted traffic.
     @Published public var apiBaseURL: URL
     
     /// API timeout interval in seconds
@@ -108,6 +110,8 @@ public final class AppConfig: ObservableObject {
         #if DEBUG
         guard let apiURL = URL(string: "http://localhost:8000"),
               let webURL = URL(string: "http://localhost:3000") else {
+            // AUDIT: Avoid fatalError in production builds. Prefer throwing init, or default to a known-safe URL
+            // and surface a user-facing configuration error. This reduces crash risk during App Store review.
             fatalError("Failed to create debug URLs - this should never happen")
         }
         self.apiBaseURL = apiURL
@@ -115,6 +119,8 @@ public final class AppConfig: ObservableObject {
         #else
         guard let apiURL = URL(string: "https://api.fightcitytickets.com"),
               let webURL = URL(string: "https://fightcitytickets.com") else {
+            // AUDIT: Avoid fatalError on release builds; surface configuration errors via logging + fallback
+            // instead of crashing. App Store review expects graceful handling of misconfiguration.
             fatalError("Failed to create production URLs - this should never happen")
         }
         self.apiBaseURL = apiURL

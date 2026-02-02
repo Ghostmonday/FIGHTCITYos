@@ -312,6 +312,8 @@ public struct FilePersistence<T: Codable> {
             try data.write(to: fileURL)
         } catch {
             // TODO: Replace with Logger.shared.error("Persistence save error", error: error)
+            // AUDIT: Replace print() with Logger to avoid leaking file system details in release builds.
+            // Consider surfacing a non-fatal warning if persistence fails (data loss risk).
             print("Persistence save error: \(error)")
         }
     }
@@ -323,6 +325,8 @@ public struct FilePersistence<T: Codable> {
             return try decoder.decode([T].self, from: data)
         } catch {
             // TODO: Replace with Logger.shared.error("Persistence load error", error: error)
+            // AUDIT: Replace print() with Logger; also consider resetting corrupted data to recover
+            // gracefully instead of repeatedly failing to decode.
             print("Persistence load error: \(error)")
             return nil
         }

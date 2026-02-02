@@ -24,6 +24,9 @@ public actor CityAddressScraper {
         
         // TODO: Implement actual HTML scraping once backend endpoint is available
         // For now, return nil to use fallback addresses
+        // AUDIT: Scraping directly on-device can violate website terms and is brittle. Prefer a backend
+        // service to perform scraping and return structured data. This is more reliable and aligns with
+        // App Store review expectations about network usage and data sourcing.
         
         // In production, this would:
         // 1. Fetch HTML from URL

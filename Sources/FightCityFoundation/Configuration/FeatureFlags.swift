@@ -210,7 +210,11 @@ public struct FeatureFlags {
     /// Print current feature flag status (for debugging)
     // TODO: Replace all print() in printCurrentStatus() with Logger calls
     // Or keep as debug-only print since it's explicitly a debug function
+    // AUDIT: Ensure this method is not called in release builds. Feature-flag output can expose internal
+    // capabilities during App Store review. Prefer #if DEBUG or removing the call sites.
     public static func printCurrentStatus() {
+        // AUDIT: Ensure this is DEBUG-only or uses Logger with privacy redaction. App Store review expects
+        // no verbose logging in production. Consider guarding with #if DEBUG or removing entirely.
         print("=== Apple Intelligence Feature Flags Status ===")
         print("VisionKit Document Scanner: \(visionKitDocumentScanner)")
         print("Live Text Analysis: \(liveTextAnalysis)")

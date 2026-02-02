@@ -23,6 +23,8 @@ import FightCityFoundation
 //
 // Current flow: capturePhoto() → processImage() → OCREngine.recognize() → OCRParsingEngine.parse()
 // Target flow: captureWithDocumentScanner() → LiveText.analyze() → MLClassifier.predict() → fallback to regex
+// AUDIT: The Apple Intelligence roadmap is duplicated below. Consider consolidating these notes into one
+// concise section or moving the detailed plan to APPLE_INTELLIGENCE_PLAN.md to reduce noise in production code.
 
 // APPLE INTELLIGENCE TODO: This ViewModel needs Apple Intelligence integration
 // Current state: Uses Vision OCR + preprocessing
@@ -148,9 +150,12 @@ public final class CaptureViewModel: ObservableObject, DocumentScanCoordinatorDe
         
         if usedDocumentScanner {
             // TODO: Replace with Logger.shared.info("Using VisionKit Document Scanner")
+            // AUDIT: Replace print() with Logger to avoid noisy output and keep logs privacy-safe for App Store.
             print("Using VisionKit Document Scanner")
         } else {
             // TODO: Replace with Logger.shared.info("Using traditional camera as fallback")
+            // AUDIT: Replace print() with Logger and consider exposing this state to UI so users understand
+            // why a fallback capture method is used.
             print("Using traditional camera as fallback")
         }
     }
@@ -252,6 +257,8 @@ public final class CaptureViewModel: ObservableObject, DocumentScanCoordinatorDe
         let processingTimeMs = Int(Date().timeIntervalSince(startTime) * 1000)
         
         // Return basic capture result without OCR processing
+        // AUDIT: OCR is currently bypassed (rawText is empty). Implement OCR processing here before
+        // App Store submission or users will not receive citation extraction. This is a core feature gap.
         return CaptureResult(
             originalImageData: data,
             rawText: "",
@@ -340,6 +347,8 @@ public final class CaptureViewModel: ObservableObject, DocumentScanCoordinatorDe
     public func documentScanCoordinator(_ coordinator: DocumentScanCoordinator, didFailWith error: DocumentScanError) {
         // Log the error and provide user feedback
         // TODO: Replace with Logger.shared.error("Document scan failed", error: error)
+        // AUDIT: Replace print() with Logger; consider reporting scan failures to telemetry (opt-in) so
+        // you can tune VisionKit configuration before App Store review.
         print("Document scan failed: \(error.localizedDescription)")
         
         // Provide specific error messages based on error type
