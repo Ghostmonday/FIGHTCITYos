@@ -81,6 +81,8 @@ public actor LobService {
     private init() {
         // Backend proxy URL - API key stored server-side
         // TODO: Configure via AppConfig or environment variable
+        // AUDIT: Inject this URL via AppConfig or dependency injection so it's testable and can be
+        // configured per environment (including App Store review builds). Avoid hardcoded URLs.
         #if DEBUG
         self.backendURL = "http://localhost:5000"
         #else
@@ -92,6 +94,8 @@ public actor LobService {
     public func configure(backendURL: String) {
         // Note: This is a workaround - ideally URL should be passed via dependency injection
         // For now, URL is set in init() based on build configuration
+        // AUDIT: Implement this so tests and App Store review can point to staging or prod without
+        // modifying code. Prefer dependency injection in the initializer.
     }
     
     /// Sends a letter via backend proxy using CERTIFIED MAIL WITH RETURN RECEIPT ONLY

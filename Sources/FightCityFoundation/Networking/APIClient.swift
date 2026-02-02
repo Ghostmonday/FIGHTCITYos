@@ -22,6 +22,9 @@ public struct DefaultAPIConfiguration: APIConfiguration {
         } else if let url = URL(string: "https://api.fightcitytickets.com") {
             self.apiBaseURL = url
         } else {
+            // AUDIT: Avoid fatalError in production. Prefer a failable init or thrown error so callers can
+            // recover (e.g., fallback to a known-safe URL or surface a configuration error) instead of crashing.
+            // This is the safest path for App Store reliability.
             fatalError("Failed to create default API URL - this should never happen")
         }
     }

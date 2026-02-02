@@ -35,6 +35,8 @@ public actor CityAddressManager {
         
         // Try to fetch from backend (if available)
         // TODO: Implement backend fetch when endpoint is available
+        // AUDIT: Implement backend fetch with caching + ETag to avoid stale addresses. This reduces
+        // shipping outdated legal addresses, which is critical for App Store compliance and user trust.
         // let backendAddress = try await fetchFromBackend(cityId: cityId)
         // addresses[cityId] = backendAddress
         // saveCachedAddresses()
@@ -67,6 +69,8 @@ public actor CityAddressManager {
     /// - Throws: Error if verification fails
     public func verifyAddress(_ address: CityMailingAddress) async throws -> Bool {
         // TODO: Implement Lob address verification once API docs provided
+        // AUDIT: Address verification should call the backend proxy (not Lob directly) to avoid exposing API
+        // keys. Validate standardized address components and return detailed errors to the UI.
         // For now, assume addresses are valid if they have required fields
         return !address.addressLine1.isEmpty &&
                !address.city.isEmpty &&

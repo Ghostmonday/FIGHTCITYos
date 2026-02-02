@@ -114,6 +114,8 @@ public final class KeychainService {
         let status = SecItemAdd(query as CFDictionary, nil)
         if status != errSecSuccess {
             // TODO: Replace with Logger.shared.error("Keychain save failed with status: \(status)")
+            // AUDIT: Replace print() with Logger and map status to a user-safe error. Consider retrying or
+            // surfacing a failure to the caller so authentication state is not silently lost.
             print("Keychain save error: \(status)")
         }
     }

@@ -72,6 +72,8 @@ public final class MailTracker: ObservableObject {
     private func pollStatus(letterId: String, citationId: String) async {
         // Poll every 5 minutes for 30 days (typical delivery window)
         // 30 days * 24 hours * 12 (5-min intervals) = 8640 polls
+        // AUDIT: Long-lived polling should be managed via background tasks or server-side webhooks.
+        // A server-driven status update is more reliable and battery-friendly for App Store review.
         for _ in 0..<8640 {
             // Check if task was cancelled
             if Task.isCancelled {
@@ -98,6 +100,8 @@ public final class MailTracker: ObservableObject {
                 // Wait 5 minutes before next poll
                 try await Task.sleep(nanoseconds: 5 * 60 * 1_000_000_000)
             } catch {
+                // AUDIT: Replace print() with Logger so errors are captured for diagnostics without console spam.
+                // Consider tracking consecutive failures and backing off to avoid excessive network usage.
                 print("Tracking poll failed: \(error)")
                 // Continue polling even on error (might be temporary network issue)
                 do {
