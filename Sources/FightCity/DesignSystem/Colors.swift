@@ -12,6 +12,15 @@ import FightCityFoundation
 // MARK: - App Colors
 
 /// Premium color palette with navy/gold luxury aesthetic
+///
+/// APP STORE READINESS: Consistent color system is crucial for polish
+/// UI POLISH: Navy/Gold palette creates premium, trustworthy feel
+/// ACCESSIBILITY: All text/background combinations must meet WCAG AA (4.5:1)
+/// TODO APP STORE: Test all colors in both light and dark modes
+/// TODO ACCESSIBILITY: Verify color contrast ratios using Xcode Accessibility Inspector
+/// TODO ENHANCEMENT: Add color blindness simulation testing
+/// DESIGN: Color choices position app as premium, professional tool
+/// NOTE: Gold accent (#d4af37) is signature brand color - use consistently
 public enum AppColors {
     
     // MARK: - Brand Colors (Luxury Palette)

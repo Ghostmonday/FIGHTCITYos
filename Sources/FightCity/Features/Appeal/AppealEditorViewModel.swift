@@ -11,6 +11,15 @@ import FightCityFoundation
 import FightCityiOS
 
 @MainActor
+// APP STORE READINESS: Appeal refinement is core value proposition
+// APPLE INTELLIGENCE: Showcases on-device AI and cloud AI integration
+// ERROR HANDLING: Must gracefully handle all failure modes (network, rate limits, AI errors)
+// TODO APP STORE: Add analytics to track success rate and user satisfaction
+// TODO ENHANCEMENT: Cache refined texts to avoid re-refinement on edits
+// TODO ACCESSIBILITY: Provide clear feedback during AI processing
+// PERFORMANCE: Refinement should complete within 5 seconds for good UX
+// RATE LIMITING: Handle rate limits gracefully with clear countdown
+// FALLBACK: Always have local fallback if AI service unavailable
 public final class AppealEditorViewModel: ObservableObject {
     @Published public var originalText: String = ""
     @Published public var refinedText: String = ""

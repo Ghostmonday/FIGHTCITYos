@@ -10,6 +10,14 @@ import SwiftUI
 // MARK: - Typography
 
 /// App typography system
+///
+/// APP STORE READINESS: Type hierarchy creates clear information architecture
+/// ACCESSIBILITY: Must support Dynamic Type for all text sizes
+/// TODO APP STORE: Test with largest accessibility text sizes (AX5)
+/// TODO ENHANCEMENT: Ensure all fonts scale properly with .dynamicTypeSize()
+/// UI POLISH: Consistent typography makes app feel cohesive and professional
+/// PERFORMANCE: System fonts are optimized, no custom fonts needed
+/// NOTE: Monospaced font for citation numbers improves scannability
 public enum AppTypography {
     // MARK: - Display Styles
     

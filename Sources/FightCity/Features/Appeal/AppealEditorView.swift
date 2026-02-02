@@ -9,7 +9,15 @@ import SwiftUI
 import FightCityFoundation
 import FightCityiOS
 
-
+// APP STORE READINESS: Appeal editor is the "killer feature" - must be perfect
+// APPLE INTELLIGENCE: AI refinement showcases Apple Intelligence integration
+// UI POLISH: Text editor needs smooth transitions and clear visual hierarchy
+// TODO APP STORE: Add sample appeals or templates to help users start
+// TODO ENHANCEMENT: Add voice-to-text for dictating appeals (Speech framework)
+// TODO ACCESSIBILITY: Ensure text editor works with VoiceOver and dictation
+// TODO ENHANCEMENT: Add character/word count with suggested length guidance
+// PERFORMANCE: AI refinement should complete within 3 seconds max
+// ERROR HANDLING: Gracefully handle AI service failures with fallback options
 public struct AppealEditorView: View {
     let citation: Citation
     let onContinue: (String) -> Void

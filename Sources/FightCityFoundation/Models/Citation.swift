@@ -8,6 +8,15 @@
 import Foundation
 
 /// Main citation model representing a parking ticket
+///
+/// APP STORE READINESS: Citation model is core data structure - must be robust
+/// DATA INTEGRITY: All validation should happen before creating Citation instances
+/// TODO APP STORE: Add data validation methods (validateCitationNumber, validateDate, etc.)
+/// TODO ENHANCEMENT: Add support for different citation formats per city
+/// TODO PERSISTENCE: Implement CoreData or SwiftData persistence layer
+/// SECURITY: Never log citation data in production (contains PII)
+/// PERFORMANCE: Keep model lightweight for list rendering performance
+/// NOTE: Model matches backend API schema - keep in sync with server
 public struct Citation: Identifiable, Codable, Equatable {
     public let id: UUID
     public let citationNumber: String

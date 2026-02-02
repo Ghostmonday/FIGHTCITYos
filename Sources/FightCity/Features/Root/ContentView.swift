@@ -82,6 +82,12 @@ public struct ContentView: View {
 
 // MARK: - Main Tab View
 
+// APP STORE READINESS: Tab bar is primary navigation - must be intuitive
+// UI POLISH: Custom tab bar appearance matches dark theme beautifully
+// ACCESSIBILITY: Tab items need proper labels for VoiceOver
+// TODO APP STORE: Consider adding badge counts for pending items
+// TODO ENHANCEMENT: Add haptic feedback on tab selection
+// PERFORMANCE: Tab switching should be instant, no lag
 struct MainTabView: View {
     @State private var selectedTab = 0
     
@@ -126,6 +132,13 @@ struct MainTabView: View {
 
 // MARK: - Home View (Hero Screen)
 
+// APP STORE READINESS: Home screen is first impression after onboarding
+// UI POLISH: Hero section needs strong visual impact - golden gradient works!
+// TODO APP STORE: Add personalization (user name, stats, achievements)
+// TODO ENHANCEMENT: Add widgets preview/setup for iOS 17+
+// TODO ACCESSIBILITY: Ensure all interactive elements have proper labels
+// PERFORMANCE: Hero animations should be smooth, test on older devices
+// MARKETING: Home screen should highlight core value proposition clearly
 struct HomeView: View {
     @EnvironmentObject private var coordinator: AppCoordinator
     @State private var hasAppeared = false

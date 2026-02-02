@@ -9,6 +9,15 @@ import Foundation
 
 /// Feature flags for Apple Intelligence implementation
 /// These flags control the gradual rollout and backward compatibility
+///
+/// APP STORE READINESS: Feature flags allow safe rollout of new features
+/// APPLE INTELLIGENCE: Central configuration for all AI features
+/// TODO APP STORE: Implement remote config to toggle features without app update
+/// TODO ENHANCEMENT: Add Firebase Remote Config or similar for dynamic flags
+/// TODO ANALYTICS: Track feature usage per flag to measure adoption
+/// TESTING: Use flags to A/B test features before full rollout
+/// ROLLBACK: Can disable problematic features instantly via remote config
+/// NOTE: Set rolloutPercentage < 100 for gradual rollout to catch issues early
 public struct FeatureFlags {
     
     // MARK: - Apple Intelligence Core Features
