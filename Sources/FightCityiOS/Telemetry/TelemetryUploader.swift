@@ -50,10 +50,7 @@ public final class TelemetryUploader {
         do {
             try BGTaskScheduler.shared.submit(request)
         } catch {
-            // TODO: Replace with Logger.shared.error("Failed to schedule background upload", error: error)
-            // AUDIT: Replace print() with Logger to ensure background task errors are captured in OSLog
-            // and not lost during App Store testing. Also consider surfacing a retry metric.
-            print("Failed to schedule background upload: \(error)")
+            Logger.shared.error("Failed to schedule background upload: \(error.localizedDescription)")
         }
     }
 }

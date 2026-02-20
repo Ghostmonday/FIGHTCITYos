@@ -100,9 +100,7 @@ public final class MailTracker: ObservableObject {
                 // Wait 5 minutes before next poll
                 try await Task.sleep(nanoseconds: 5 * 60 * 1_000_000_000)
             } catch {
-                // AUDIT: Replace print() with Logger so errors are captured for diagnostics without console spam.
-                // Consider tracking consecutive failures and backing off to avoid excessive network usage.
-                print("Tracking poll failed: \(error)")
+                Logger.shared.error("Tracking poll failed: \(error.localizedDescription)")
                 // Continue polling even on error (might be temporary network issue)
                 do {
                     try await Task.sleep(nanoseconds: 5 * 60 * 1_000_000_000)

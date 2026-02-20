@@ -122,10 +122,7 @@ public final class TelemetryService: ObservableObject {
             pendingCount = storage.pendingCount()
             lastUploadDate = Date()
         } catch {
-            // TODO: Replace with Logger.shared.error("Telemetry upload failed", error: error)
-            // AUDIT: Telemetry uploads should avoid print() in release builds; replace with Logger to keep
-            // logs centralized and privacy-aware. Also consider retry/backoff visibility for App Store support.
-            print("Telemetry upload failed: \(error)")
+            Logger.shared.error("Telemetry upload failed: \(error.localizedDescription)")
         }
     }
     
